@@ -1,0 +1,2272 @@
+openapi: 3.1.0
+info:
+  title: Gym Management System API
+  version: 1.0.0
+  description: Machine-readable V1 contract. Base monetary unit is integer minor units (100 = 1 EGP). Arabic RTL owner UI.
+servers:
+- url: /api/v1
+security:
+- cookieAuth: []
+tags:
+- name: Auth
+- name: Members
+- name: Plans
+- name: Subscriptions
+- name: Payments
+- name: Receipts
+- name: Dashboard
+- name: Audit
+- name: Health
+paths:
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnerResponse'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '429':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /auth/logout:
+    post:
+      tags:
+      - Auth
+      responses:
+        '204':
+          description: Session revoked and cookie cleared
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /auth/me:
+    get:
+      tags:
+      - Auth
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnerResponse'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /auth/change-password:
+    post:
+      tags:
+      - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '204':
+          description: Password changed
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /members:
+    get:
+      tags:
+      - Members
+      parameters:
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: archived
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - name: subscriptionState
+        in: query
+        schema:
+          type: string
+          enum:
+          - NONE
+          - SCHEDULED
+          - ACTIVE
+          - EXPIRED
+      - name: hasDebt
+        in: query
+        schema:
+          type: boolean
+      - $ref: '#/components/schemas/Page'
+      - $ref: '#/components/schemas/Limit'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberListResponse'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    post:
+      tags:
+      - Members
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMemberRequest'
+      responses:
+        '201':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberDetail'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /members/{memberId}:
+    get:
+      tags:
+      - Members
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberDetail'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    patch:
+      tags:
+      - Members
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMemberRequest'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberDetail'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /members/{memberId}/archive:
+    post:
+      tags:
+      - Members
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberDetail'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /members/{memberId}/restore:
+    post:
+      tags:
+      - Members
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberDetail'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /members/{memberId}/photo:
+    post:
+      tags:
+      - Members
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoResponse'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '413':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    get:
+      tags:
+      - Members
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      responses:
+        '200':
+          description: Normalized member photo
+          content:
+            image/webp:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /members/{memberId}/subscriptions:
+    get:
+      tags:
+      - Subscriptions
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      - $ref: '#/components/schemas/Page'
+      - $ref: '#/components/schemas/Limit'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionListResponse'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    post:
+      tags:
+      - Subscriptions
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubscriptionRequest'
+      responses:
+        '201':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionCreateResponse'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '422':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /members/{memberId}/subscriptions/renew:
+    post:
+      tags:
+      - Subscriptions
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewSubscriptionRequest'
+      responses:
+        '201':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionCreateResponse'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '422':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /members/{memberId}/payments:
+    get:
+      tags:
+      - Payments
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      - $ref: '#/components/schemas/Page'
+      - $ref: '#/components/schemas/Limit'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentListResponse'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    post:
+      tags:
+      - Payments
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+      responses:
+        '201':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '422':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /members/{memberId}/audit-log:
+    get:
+      tags:
+      - Audit
+      parameters:
+      - $ref: '#/components/schemas/MemberId'
+      - $ref: '#/components/schemas/Page'
+      - $ref: '#/components/schemas/Limit'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditListResponse'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /plans:
+    get:
+      tags:
+      - Plans
+      parameters:
+      - name: enabled
+        in: query
+        schema:
+          type: boolean
+      - $ref: '#/components/schemas/Page'
+      - $ref: '#/components/schemas/Limit'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanListResponse'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    post:
+      tags:
+      - Plans
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanMutationRequest'
+      responses:
+        '201':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /plans/{planId}:
+    get:
+      tags:
+      - Plans
+      parameters:
+      - $ref: '#/components/schemas/PlanId'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    patch:
+      tags:
+      - Plans
+      parameters:
+      - $ref: '#/components/schemas/PlanId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePlanRequest'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /plans/{planId}/enable:
+    post:
+      tags:
+      - Plans
+      parameters:
+      - $ref: '#/components/schemas/PlanId'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /plans/{planId}/disable:
+    post:
+      tags:
+      - Plans
+      parameters:
+      - $ref: '#/components/schemas/PlanId'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /subscriptions/{subscriptionId}:
+    get:
+      tags:
+      - Subscriptions
+      parameters:
+      - $ref: '#/components/schemas/SubscriptionId'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    patch:
+      tags:
+      - Subscriptions
+      parameters:
+      - $ref: '#/components/schemas/SubscriptionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubscriptionRequest'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '422':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /subscriptions/{subscriptionId}/void:
+    post:
+      tags:
+      - Subscriptions
+      parameters:
+      - $ref: '#/components/schemas/SubscriptionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoidRequest'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '422':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /payments/{paymentId}:
+    get:
+      tags:
+      - Payments
+      parameters:
+      - $ref: '#/components/schemas/PaymentId'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentDetailResponse'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /payments/{paymentId}/void:
+    post:
+      tags:
+      - Payments
+      parameters:
+      - $ref: '#/components/schemas/PaymentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoidRequest'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /payments/{paymentId}/receipt:
+    get:
+      tags:
+      - Receipts
+      parameters:
+      - $ref: '#/components/schemas/PaymentId'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiptView'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /payments/{paymentId}/receipt.pdf:
+    get:
+      tags:
+      - Receipts
+      parameters:
+      - $ref: '#/components/schemas/PaymentId'
+      responses:
+        '200':
+          description: Receipt PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /receipts/verify/{token}:
+    get:
+      tags:
+      - Receipts
+      security: []
+      parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 16
+          maxLength: 32
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiptVerification'
+        '404':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '429':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /dashboard/summary:
+    get:
+      tags:
+      - Dashboard
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummary'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /dashboard/debtors:
+    get:
+      tags:
+      - Dashboard
+      parameters:
+      - name: sort
+        in: query
+        schema:
+          type: string
+          enum:
+          - balance_desc
+          default: balance_desc
+      - $ref: '#/components/schemas/Page'
+      - $ref: '#/components/schemas/Limit'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtorListResponse'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /dashboard/expiring:
+    get:
+      tags:
+      - Dashboard
+      parameters:
+      - $ref: '#/components/schemas/Page'
+      - $ref: '#/components/schemas/Limit'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpiringListResponse'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /audit-logs:
+    get:
+      tags:
+      - Audit
+      parameters:
+      - name: entityType
+        in: query
+        schema:
+          type: string
+          enum:
+          - MEMBER
+          - PLAN
+          - SUBSCRIPTION
+          - PAYMENT
+      - name: action
+        in: query
+        schema:
+          type: string
+          enum:
+          - MEMBER_CREATED
+          - MEMBER_UPDATED
+          - MEMBER_ARCHIVED
+          - MEMBER_RESTORED
+          - PLAN_CREATED
+          - PLAN_UPDATED
+          - PLAN_ENABLED
+          - PLAN_DISABLED
+          - SUBSCRIPTION_CREATED
+          - SUBSCRIPTION_UPDATED
+          - SUBSCRIPTION_VOIDED
+          - PAYMENT_CREATED
+          - PAYMENT_VOIDED
+      - name: entityId
+        in: query
+        schema:
+          type: string
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      - $ref: '#/components/schemas/Page'
+      - $ref: '#/components/schemas/Limit'
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditListResponse'
+        '400':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: خطأ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /health:
+    get:
+      tags:
+      - Health
+      security: []
+      responses:
+        '200':
+          description: نجاح
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Database/process unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: gym_session
+  parameters:
+    MemberId:
+      name: memberId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PlanId:
+      name: planId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SubscriptionId:
+      name: subscriptionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PaymentId:
+      name: paymentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    ApiError:
+      type: object
+      additionalProperties: false
+      required:
+      - statusCode
+      - code
+      - message
+      - details
+      properties:
+        statusCode:
+          type: integer
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          anyOf:
+          - type: object
+            additionalProperties: true
+          - type: 'null'
+    Pagination:
+      type: object
+      additionalProperties: false
+      required:
+      - page
+      - limit
+      - totalItems
+      - totalPages
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+        totalItems:
+          type: integer
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+    Owner:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - username
+      - mustChangePassword
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        mustChangePassword:
+          type: boolean
+    PlanPrice:
+      type: object
+      additionalProperties: false
+      required:
+      - durationMonths
+      - priceMinor
+      properties:
+        durationMonths:
+          type: integer
+          enum:
+          - 1
+          - 3
+          - 6
+          - 12
+        priceMinor:
+          type: integer
+          minimum: 0
+          description: Integer minor units; 100 = 1 EGP
+    Plan:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - name
+      - isEnabled
+      - prices
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        isEnabled:
+          type: boolean
+        prices:
+          type: array
+          minItems: 4
+          maxItems: 4
+          items:
+            $ref: '#/components/schemas/PlanPrice'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Subscription:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - memberId
+      - planId
+      - planNameSnapshot
+      - durationMonths
+      - listedPriceMinor
+      - agreedPriceMinor
+      - startDate
+      - endDate
+      - state
+      - voidedAt
+      - voidReason
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        memberId:
+          type: string
+          format: uuid
+        planId:
+          type: string
+          format: uuid
+        planNameSnapshot:
+          type: string
+        durationMonths:
+          type: integer
+          enum:
+          - 1
+          - 3
+          - 6
+          - 12
+        listedPriceMinor:
+          type: integer
+          minimum: 0
+        agreedPriceMinor:
+          type: integer
+          minimum: 0
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        state:
+          type: string
+          enum:
+          - SCHEDULED
+          - ACTIVE
+          - EXPIRED
+          - VOIDED
+        voidedAt:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+        voidReason:
+          anyOf:
+          - type: string
+          - type: 'null'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Payment:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - memberId
+      - amountMinor
+      - paymentDate
+      - paymentMethod
+      - receiptNumber
+      - balanceAfterPaymentMinor
+      - status
+      - voidedAt
+      - voidReason
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        memberId:
+          type: string
+          format: uuid
+        amountMinor:
+          type: integer
+          minimum: 1
+        paymentDate:
+          type: string
+          format: date
+        paymentMethod:
+          type: string
+          const: CASH
+        receiptNumber:
+          type: string
+        balanceAfterPaymentMinor:
+          type: integer
+          minimum: 0
+        status:
+          type: string
+          enum:
+          - VALID
+          - VOIDED
+        voidedAt:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+        voidReason:
+          anyOf:
+          - type: string
+          - type: 'null'
+        createdAt:
+          type: string
+          format: date-time
+    MemberSummary:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - name
+      - phone
+      - photoUrl
+      - isArchived
+      - subscriptionState
+      - subscriptionEndDate
+      - outstandingBalanceMinor
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        phone:
+          type: string
+        photoUrl:
+          anyOf:
+          - type: string
+          - type: 'null'
+        isArchived:
+          type: boolean
+        subscriptionState:
+          type: string
+          enum:
+          - NONE
+          - SCHEDULED
+          - ACTIVE
+          - EXPIRED
+        subscriptionEndDate:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+        outstandingBalanceMinor:
+          type: integer
+          minimum: 0
+    MemberDetail:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - name
+      - phone
+      - gender
+      - dateOfBirth
+      - photoUrl
+      - heightCm
+      - weightKg
+      - joinDate
+      - isArchived
+      - archivedAt
+      - currentSubscription
+      - nextSubscription
+      - outstandingBalanceMinor
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        phone:
+          type: string
+        gender:
+          type: string
+          enum:
+          - MALE
+          - FEMALE
+        dateOfBirth:
+          type: string
+          format: date
+        photoUrl:
+          anyOf:
+          - type: string
+          - type: 'null'
+        heightCm:
+          anyOf:
+          - type: number
+            exclusiveMinimum: 0
+            maximum: 300
+          - type: 'null'
+        weightKg:
+          anyOf:
+          - type: number
+            exclusiveMinimum: 0
+            maximum: 500
+          - type: 'null'
+        joinDate:
+          type: string
+          format: date
+        isArchived:
+          type: boolean
+        archivedAt:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+        currentSubscription:
+          anyOf:
+          - $ref: '#/components/schemas/Subscription'
+          - type: 'null'
+        nextSubscription:
+          anyOf:
+          - $ref: '#/components/schemas/Subscription'
+          - type: 'null'
+        outstandingBalanceMinor:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    AuditLogItem:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - actorOwnerId
+      - entityType
+      - entityId
+      - action
+      - before
+      - after
+      - metadata
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        actorOwnerId:
+          type: string
+          format: uuid
+        entityType:
+          type: string
+          enum:
+          - MEMBER
+          - PLAN
+          - SUBSCRIPTION
+          - PAYMENT
+        entityId:
+          type: string
+        action:
+          type: string
+          enum:
+          - MEMBER_CREATED
+          - MEMBER_UPDATED
+          - MEMBER_ARCHIVED
+          - MEMBER_RESTORED
+          - PLAN_CREATED
+          - PLAN_UPDATED
+          - PLAN_ENABLED
+          - PLAN_DISABLED
+          - SUBSCRIPTION_CREATED
+          - SUBSCRIPTION_UPDATED
+          - SUBSCRIPTION_VOIDED
+          - PAYMENT_CREATED
+          - PAYMENT_VOIDED
+        before:
+          anyOf:
+          - type: object
+            additionalProperties: true
+          - type: 'null'
+        after:
+          anyOf:
+          - type: object
+            additionalProperties: true
+          - type: 'null'
+        metadata:
+          anyOf:
+          - type: object
+            additionalProperties: true
+          - type: 'null'
+        createdAt:
+          type: string
+          format: date-time
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - username
+      - password
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 100
+        password:
+          type: string
+          minLength: 1
+    ChangePasswordRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - currentPassword
+      - newPassword
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 10
+    CreateMemberRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - name
+      - phone
+      - gender
+      - dateOfBirth
+      - joinDate
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 150
+        phone:
+          type: string
+        gender:
+          type: string
+          enum:
+          - MALE
+          - FEMALE
+        dateOfBirth:
+          type: string
+          format: date
+        heightCm:
+          anyOf:
+          - type: number
+            exclusiveMinimum: 0
+            maximum: 300
+          - type: 'null'
+        weightKg:
+          anyOf:
+          - type: number
+            exclusiveMinimum: 0
+            maximum: 500
+          - type: 'null'
+        joinDate:
+          type: string
+          format: date
+    UpdateMemberRequest:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 150
+        phone:
+          type: string
+        gender:
+          type: string
+          enum:
+          - MALE
+          - FEMALE
+        dateOfBirth:
+          type: string
+          format: date
+        heightCm:
+          anyOf:
+          - type: number
+            exclusiveMinimum: 0
+            maximum: 300
+          - type: 'null'
+        weightKg:
+          anyOf:
+          - type: number
+            exclusiveMinimum: 0
+            maximum: 500
+          - type: 'null'
+        joinDate:
+          type: string
+          format: date
+    PlanMutationRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - name
+      - prices
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        prices:
+          type: array
+          minItems: 4
+          maxItems: 4
+          items:
+            $ref: '#/components/schemas/PlanPrice'
+    UpdatePlanRequest:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        prices:
+          type: array
+          minItems: 4
+          maxItems: 4
+          items:
+            $ref: '#/components/schemas/PlanPrice'
+    InitialPaymentInput:
+      type: object
+      additionalProperties: false
+      required:
+      - amountMinor
+      - paymentDate
+      properties:
+        amountMinor:
+          type: integer
+          minimum: 1
+        paymentDate:
+          type: string
+          format: date
+    CreateSubscriptionRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - planId
+      - durationMonths
+      - startDate
+      - agreedPriceMinor
+      properties:
+        planId:
+          type: string
+          format: uuid
+        durationMonths:
+          type: integer
+          enum:
+          - 1
+          - 3
+          - 6
+          - 12
+        startDate:
+          type: string
+          format: date
+        agreedPriceMinor:
+          type: integer
+          minimum: 0
+        initialPayment:
+          anyOf:
+          - $ref: '#/components/schemas/InitialPaymentInput'
+          - type: 'null'
+    RenewSubscriptionRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - planId
+      - durationMonths
+      - agreedPriceMinor
+      properties:
+        planId:
+          type: string
+          format: uuid
+        durationMonths:
+          type: integer
+          enum:
+          - 1
+          - 3
+          - 6
+          - 12
+        agreedPriceMinor:
+          type: integer
+          minimum: 0
+        initialPayment:
+          anyOf:
+          - $ref: '#/components/schemas/InitialPaymentInput'
+          - type: 'null'
+    UpdateSubscriptionRequest:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        planId:
+          type: string
+          format: uuid
+        durationMonths:
+          type: integer
+          enum:
+          - 1
+          - 3
+          - 6
+          - 12
+        startDate:
+          type: string
+          format: date
+        agreedPriceMinor:
+          type: integer
+          minimum: 0
+    VoidRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - reason
+      properties:
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 500
+    CreatePaymentRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - amountMinor
+      - paymentDate
+      properties:
+        amountMinor:
+          type: integer
+          minimum: 1
+        paymentDate:
+          type: string
+          format: date
+    OwnerResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - owner
+      properties:
+        owner:
+          $ref: '#/components/schemas/Owner'
+    MemberListResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - items
+      - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberSummary'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    PlanListResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - items
+      - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    SubscriptionListResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - items
+      - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    PaymentListResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - items
+      - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    AuditListResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - items
+      - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLogItem'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    SubscriptionCreateResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - subscription
+      - initialPayment
+      - outstandingBalanceMinor
+      properties:
+        subscription:
+          $ref: '#/components/schemas/Subscription'
+        initialPayment:
+          anyOf:
+          - $ref: '#/components/schemas/Payment'
+          - type: 'null'
+        outstandingBalanceMinor:
+          type: integer
+          minimum: 0
+    PaymentDetailResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - payment
+      - member
+      properties:
+        payment:
+          $ref: '#/components/schemas/Payment'
+        member:
+          type: object
+          additionalProperties: false
+          required:
+          - id
+          - name
+          - phone
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+            phone:
+              type: string
+    ReceiptView:
+      type: object
+      additionalProperties: false
+      required:
+      - receiptNumber
+      - status
+      - member
+      - amountMinor
+      - paymentMethod
+      - paymentDate
+      - balanceAfterPaymentMinor
+      - verificationCode
+      - verificationUrl
+      - createdAt
+      properties:
+        receiptNumber:
+          type: string
+        status:
+          type: string
+          enum:
+          - VALID
+          - VOIDED
+        member:
+          type: object
+          additionalProperties: false
+          required:
+          - id
+          - name
+          - phone
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+            phone:
+              type: string
+        amountMinor:
+          type: integer
+          minimum: 1
+        paymentMethod:
+          type: string
+          const: CASH
+        paymentDate:
+          type: string
+          format: date
+        balanceAfterPaymentMinor:
+          type: integer
+          minimum: 0
+        verificationCode:
+          type: string
+          description: Grouped display form of canonical random token
+        verificationUrl:
+          type: string
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+    ReceiptVerification:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - receiptNumber
+      - memberName
+      - maskedPhone
+      - amountMinor
+      - paymentDate
+      properties:
+        status:
+          type: string
+          enum:
+          - VALID
+          - VOIDED
+        receiptNumber:
+          type: string
+        memberName:
+          type: string
+        maskedPhone:
+          type: string
+          description: Masked Egyptian mobile number; full phone number is never public
+        amountMinor:
+          type: integer
+          minimum: 1
+        paymentDate:
+          type: string
+          format: date
+    DashboardSummary:
+      type: object
+      additionalProperties: false
+      required:
+      - activeMembers
+      - expiredMemberships
+      - expiringWithin7Days
+      - newMembersThisMonth
+      - revenueTodayMinor
+      - revenueThisMonthMinor
+      - totalOutstandingDebtMinor
+      properties:
+        activeMembers:
+          type: integer
+          minimum: 0
+        expiredMemberships:
+          type: integer
+          minimum: 0
+        expiringWithin7Days:
+          type: integer
+          minimum: 0
+        newMembersThisMonth:
+          type: integer
+          minimum: 0
+        revenueTodayMinor:
+          type: integer
+          minimum: 0
+        revenueThisMonthMinor:
+          type: integer
+          minimum: 0
+        totalOutstandingDebtMinor:
+          type: integer
+          minimum: 0
+    DebtorItem:
+      type: object
+      additionalProperties: false
+      required:
+      - memberId
+      - name
+      - phone
+      - isArchived
+      - outstandingBalanceMinor
+      properties:
+        memberId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        phone:
+          type: string
+        isArchived:
+          type: boolean
+        outstandingBalanceMinor:
+          type: integer
+          minimum: 1
+    DebtorListResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - items
+      - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebtorItem'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    ExpiringItem:
+      type: object
+      additionalProperties: false
+      required:
+      - memberId
+      - memberName
+      - phone
+      - subscriptionId
+      - planName
+      - endDate
+      - daysRemaining
+      properties:
+        memberId:
+          type: string
+          format: uuid
+        memberName:
+          type: string
+        phone:
+          type: string
+        subscriptionId:
+          type: string
+          format: uuid
+        planName:
+          type: string
+        endDate:
+          type: string
+          format: date
+        daysRemaining:
+          type: integer
+          minimum: 0
+          maximum: 7
+    ExpiringListResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - items
+      - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpiringItem'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    PhotoResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - photoUrl
+      properties:
+        photoUrl:
+          type: string
+    HealthResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - database
+      properties:
+        status:
+          type: string
+          const: ok
+        database:
+          type: string
+          const: ok

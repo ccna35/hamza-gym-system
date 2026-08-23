@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node", "jest", "multer"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "paths": {
+      "@gym/shared": ["../../packages/shared/src"]
+    },
+    "incremental": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "test"],
+  "exclude": ["../../packages/shared"]
+}
