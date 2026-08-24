@@ -292,45 +292,6 @@ export function MemberProfilePage() {
           </div>
         )}
       </section>
-      <section className="mt-6">
-        <div className="mb-3">
-          <h2 className="text-xl font-bold">سجل عمليات العضو</h2>
-          <p className="mt-1 text-sm text-[#68736b]">
-            التعديلات والأرشفة والاستعادة محفوظة زمنياً.
-          </p>
-        </div>
-        {audit.isPending ? (
-          <LoadingState />
-        ) : audit.isError ? (
-          <ErrorState onRetry={() => audit.refetch()} />
-        ) : audit.data.items.length === 0 ? (
-          <EmptyState title="لا توجد عمليات مسجلة" description="ستظهر تغييرات بيانات العضو هنا." />
-        ) : (
-          <div className="space-y-3">
-            {audit.data.items.map((item) => (
-              <article
-                className="rounded-xl border border-[#d9d2c4] bg-[#fffdf8] p-4"
-                key={item.id}
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-semibold">{actionLabels[item.action] ?? item.action}</p>
-                  <time className="text-sm text-[#68736b]">
-                    {new Intl.DateTimeFormat('ar-EG', {
-                      dateStyle: 'medium',
-                      timeStyle: 'short',
-                    }).format(new Date(item.createdAt))}
-                  </time>
-                </div>
-                {item.metadata?.reason ? (
-                  <p className="mt-2 text-sm text-[#59665d]">
-                    السبب: {String(item.metadata.reason)}
-                  </p>
-                ) : null}
-              </article>
-            ))}
-          </div>
-        )}
-      </section>
       <MemberFormModal isOpen={formOpen} member={value} onClose={() => setFormOpen(false)} />
       <PhotoUploadModal
         isOpen={photoOpen}
