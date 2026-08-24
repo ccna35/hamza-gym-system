@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { getMembers, MemberListItem } from '../api/client';
 import { MemberAvatar } from '../components/members/MemberAvatar';
 import { MemberFormModal } from '../components/members/MemberFormModal';
+import { Button } from '../components/ui/Button';
+import { Input, Select } from '../components/ui/FormControl';
 import {
   EmptyState,
   ErrorState,
@@ -54,6 +56,11 @@ function MemberCard({ member }: { member: MemberListItem }) {
         </span>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 border-t border-[#eee8dd] pt-3 text-sm">
+        {member.subscriptionPlanName && (
+          <p className="col-span-2 font-semibold text-[var(--primary)]">
+            {member.subscriptionPlanName}
+          </p>
+        )}
         <div>
           <p className="text-[#6d776f]">انتهاء الاشتراك</p>
           <p className="mt-1 font-medium">{date(member.subscriptionEndDate)}</p>
@@ -61,7 +68,7 @@ function MemberCard({ member }: { member: MemberListItem }) {
         <div>
           <p className="text-[#6d776f]">الرصيد المستحق</p>
           <p
-            className={`mt-1 font-semibold ${member.outstandingBalanceMinor > 0 ? 'text-[#9b3d2e]' : 'text-[#315c45]'}`}
+            className={`mt-1 font-semibold ${member.outstandingBalanceMinor > 0 ? 'text-[#9b3d2e]' : 'text-[var(--primary)]'}`}
           >
             {money(member.outstandingBalanceMinor)}
           </p>
@@ -102,14 +109,10 @@ export function MembersPage() {
           <p className="text-sm text-[#68736b]">إدارة بيانات واشتراكات العملاء</p>
           <h1 className="mt-1 text-2xl font-bold">الأعضاء</h1>
         </div>
-        <button
-          className="flex min-h-11 items-center gap-2 rounded-lg bg-[#315c45] px-4 font-semibold text-white hover:bg-[#234633]"
-          onClick={() => setFormOpen(true)}
-          type="button"
-        >
+        <Button onClick={() => setFormOpen(true)} type="button">
           <Plus size={19} />
           إضافة عضو
-        </button>
+        </Button>
       </header>
       <section
         className="mt-6 rounded-xl border border-[#d9d2c4] bg-[#fffdf8] p-4"
@@ -122,8 +125,8 @@ export function MembersPage() {
               className="pointer-events-none absolute right-3 top-3 text-[#718078]"
               size={20}
             />
-            <input
-              className="min-h-11 w-full rounded-lg border border-[#c7bfb1] bg-white pr-10 pl-3 outline-none focus:border-[#315c45] focus:ring-2 focus:ring-[#315c45]/20"
+            <Input
+              className="pr-10"
               onChange={(e) => {
                 setSearch(e.target.value);
                 setPage(1);
@@ -134,8 +137,7 @@ export function MembersPage() {
           </label>
           <label>
             <span className="sr-only">حالة الأرشفة</span>
-            <select
-              className="min-h-11 w-full rounded-lg border border-[#c7bfb1] bg-white px-3"
+            <Select
               onChange={(e) => {
                 setArchived(e.target.value === 'true');
                 setPage(1);
@@ -144,33 +146,25 @@ export function MembersPage() {
             >
               <option value="false">الأعضاء الحاليون</option>
               <option value="true">الأعضاء المؤرشفون</option>
-            </select>
+            </Select>
           </label>
           <label>
             <span className="sr-only">حالة الاشتراك</span>
-            <select
-              className="min-h-11 w-full rounded-lg border border-[#c7bfb1] bg-white px-3"
-              onChange={(e) => updateFilter(setState, e.target.value)}
-              value={state}
-            >
+            <Select onChange={(e) => updateFilter(setState, e.target.value)} value={state}>
               <option value="">كل الاشتراكات</option>
               <option value="ACTIVE">نشط</option>
               <option value="SCHEDULED">قادم</option>
               <option value="EXPIRED">منتهي</option>
               <option value="NONE">بدون اشتراك</option>
-            </select>
+            </Select>
           </label>
           <label>
             <span className="sr-only">حالة المديونية</span>
-            <select
-              className="min-h-11 w-full rounded-lg border border-[#c7bfb1] bg-white px-3"
-              onChange={(e) => updateFilter(setDebt, e.target.value)}
-              value={debt}
-            >
+            <Select onChange={(e) => updateFilter(setDebt, e.target.value)} value={debt}>
               <option value="">كل الأرصدة</option>
               <option value="true">عليه مستحقات</option>
               <option value="false">بدون مستحقات</option>
-            </select>
+            </Select>
           </label>
         </div>
         <div className="mt-3 flex items-center gap-2 text-xs text-[#68736b]">
@@ -223,11 +217,16 @@ export function MembersPage() {
                         </div>
                       </td>
                       <td className="p-4">
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${stateStyles[member.subscriptionState]}`}
-                        >
-                          {stateLabels[member.subscriptionState]}
-                        </span>
+                        <div className="space-y-1.5">
+                          <span
+                            className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${stateStyles[member.subscriptionState]}`}
+                          >
+                            {stateLabels[member.subscriptionState]}
+                          </span>
+                          {member.subscriptionPlanName && (
+                            <p className="text-sm font-medium">{member.subscriptionPlanName}</p>
+                          )}
+                        </div>
                       </td>
                       <td className="p-4 text-sm">{date(member.subscriptionEndDate)}</td>
                       <td
@@ -237,7 +236,7 @@ export function MembersPage() {
                       </td>
                       <td className="p-4">
                         <Link
-                          className="font-semibold text-[#315c45] hover:underline"
+                          className="font-semibold text-[var(--primary)] hover:underline"
                           to={`/members/${member.id}`}
                         >
                           فتح الملف

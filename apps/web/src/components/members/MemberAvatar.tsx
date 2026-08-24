@@ -22,7 +22,7 @@ export function MemberAvatar({
   return (
     <span
       aria-hidden="true"
-      className={`${size} grid shrink-0 place-items-center rounded-xl bg-[#e2ebe3] text-[#315c45]`}
+      className={`${size} grid shrink-0 place-items-center rounded-xl bg-[var(--primary-soft)] text-[var(--primary)]`}
     >
       <UserRound size={large ? 38 : 20} />
     </span>

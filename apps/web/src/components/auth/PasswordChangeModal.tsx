@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ApiError, changePassword } from '../../api/client';
 import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/FormControl';
 
 interface PasswordChangeModalProps {
   isOpen: boolean;
@@ -37,9 +39,9 @@ export function PasswordChangeModal({ isOpen, onClose }: PasswordChangeModalProp
         <label className="block font-medium" htmlFor="current-password">
           كلمة المرور الحالية
         </label>
-        <input
+        <Input
           autoComplete="current-password"
-          className="mt-2 min-h-11 w-full rounded-lg border border-[#b9b2a6] bg-white px-3 outline-none focus:border-[#315c45] focus:ring-2 focus:ring-[#dce9df]"
+          className="mt-2"
           id="current-password"
           onChange={(event) => setCurrentPassword(event.target.value)}
           required
@@ -49,9 +51,9 @@ export function PasswordChangeModal({ isOpen, onClose }: PasswordChangeModalProp
         <label className="mt-5 block font-medium" htmlFor="new-password">
           كلمة المرور الجديدة
         </label>
-        <input
+        <Input
           autoComplete="new-password"
-          className="mt-2 min-h-11 w-full rounded-lg border border-[#b9b2a6] bg-white px-3 outline-none focus:border-[#315c45] focus:ring-2 focus:ring-[#dce9df]"
+          className="mt-2"
           id="new-password"
           minLength={10}
           onChange={(event) => setNewPassword(event.target.value)}
@@ -68,20 +70,12 @@ export function PasswordChangeModal({ isOpen, onClose }: PasswordChangeModalProp
           </p>
         )}
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <button
-            className="min-h-11 rounded-lg border border-[#b9b2a6] px-4"
-            onClick={onClose}
-            type="button"
-          >
+          <Button variant="outline" onClick={onClose} type="button">
             إلغاء
-          </button>
-          <button
-            className="min-h-11 rounded-lg bg-[#315c45] px-4 font-semibold text-white disabled:opacity-60"
-            disabled={mutation.isPending}
-            type="submit"
-          >
+          </Button>
+          <Button disabled={mutation.isPending} type="submit">
             {mutation.isPending ? 'جارٍ الحفظ...' : 'حفظ كلمة المرور'}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

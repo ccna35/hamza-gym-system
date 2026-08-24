@@ -11,6 +11,9 @@ const api = vi.hoisted(() => ({
   changePassword: vi.fn(),
   getCurrentOwner: vi.fn(),
   getHealth: vi.fn(),
+  getDashboardSummary: vi.fn(),
+  getDashboardDebtors: vi.fn(),
+  getDashboardExpiring: vi.fn(),
   login: vi.fn(),
   logout: vi.fn(),
   uploadMemberPhoto: vi.fn(),
@@ -31,6 +34,29 @@ describe('authentication experience', () => {
     api.login.mockReset();
     api.getCurrentOwner.mockReset();
     api.getHealth.mockReset().mockResolvedValue({ status: 'ok', database: 'ok' });
+    api.getDashboardSummary
+      .mockReset()
+      .mockResolvedValue({
+        activeMembers: 12,
+        expiredMemberships: 2,
+        expiringWithin7Days: 1,
+        newMembersThisMonth: 3,
+        revenueTodayMinor: 10000,
+        revenueThisMonthMinor: 50000,
+        totalOutstandingDebtMinor: 20000,
+      });
+    api.getDashboardDebtors
+      .mockReset()
+      .mockResolvedValue({
+        items: [],
+        pagination: { page: 1, limit: 6, totalItems: 0, totalPages: 0 },
+      });
+    api.getDashboardExpiring
+      .mockReset()
+      .mockResolvedValue({
+        items: [],
+        pagination: { page: 1, limit: 6, totalItems: 0, totalPages: 0 },
+      });
   });
 
   it('shows the Arabic login error for invalid credentials', async () => {
@@ -55,7 +81,9 @@ describe('authentication experience', () => {
     await user.type(screen.getByLabelText('اسم المستخدم'), 'owner');
     await user.type(screen.getByLabelText('كلمة المرور'), 'valid-password');
     await user.click(screen.getByRole('button', { name: 'تسجيل الدخول' }));
-    expect(await screen.findByRole('heading', { name: 'لوحة التحكم' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'نظرة عامة على الصالة' }),
+    ).toBeInTheDocument();
   });
 
   it('shows the temporary-password warning without blocking the shell', async () => {
@@ -64,7 +92,7 @@ describe('authentication experience', () => {
       owner: { id: '1', username: 'owner', mustChangePassword: true },
     });
     render(<App />);
-    expect(await screen.findByText('يرجى تغيير كلمة المرور المؤقتة.')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'لوحة التحكم' })).toBeInTheDocument();
+    expect(await screen.findByText('غيّر كلمة المرور المؤقتة')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'نظرة عامة على الصالة' })).toBeInTheDocument();
   });
 });

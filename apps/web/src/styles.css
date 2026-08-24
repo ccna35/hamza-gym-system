@@ -1,9 +1,29 @@
 @import 'tailwindcss';
 
 :root {
+  /* Brand theme — change these two values to recolor the application. */
+  --primary: #315c45;
+  --secondary: #d4a95b;
+
+  /* Semantic tokens derived from the brand palette. */
+  --primary-hover: color-mix(in srgb, var(--primary) 82%, black);
+  --primary-soft: color-mix(in srgb, var(--primary) 12%, white);
+  --secondary-soft: color-mix(in srgb, var(--secondary) 22%, white);
+  --background: #f4f0e8;
+  --foreground: #17221d;
+  --card: #fffdf8;
+  --muted: #f1ede5;
+  --muted-foreground: #68736b;
+  --border: #d9d2c4;
+  --input: #c7bfb1;
+  --destructive: #9b3d2e;
+  --destructive-soft: #f7e3df;
+  --success: #27613f;
+  --success-soft: #dcecdf;
+  --radius: 0.65rem;
   font-family: system-ui, sans-serif;
-  color: #17221d;
-  background: #f4f0e8;
+  color: var(--foreground);
+  background: var(--background);
 }
 
 body {
@@ -23,6 +43,88 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 :focus-visible {
-  outline: 3px solid rgb(49 92 69 / 35%);
+  outline: 3px solid color-mix(in srgb, var(--primary) 35%, transparent);
   outline-offset: 2px;
+}
+
+@layer components {
+  .ui-button {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50;
+  }
+  .ui-button-primary {
+    background: var(--primary);
+    color: white;
+  }
+  .ui-button-primary:hover {
+    background: var(--primary-hover);
+  }
+  .ui-button-secondary {
+    background: var(--secondary);
+    color: var(--foreground);
+  }
+  .ui-button-secondary:hover {
+    filter: brightness(0.94);
+  }
+  .ui-button-outline {
+    border: 1px solid var(--input);
+    background: var(--card);
+    color: var(--foreground);
+  }
+  .ui-button-outline:hover,
+  .ui-button-ghost:hover {
+    background: var(--muted);
+  }
+  .ui-button-ghost {
+    background: transparent;
+    color: var(--foreground);
+  }
+  .ui-button-destructive {
+    background: var(--destructive);
+    color: white;
+  }
+  .ui-button-destructive:hover {
+    filter: brightness(0.9);
+  }
+  .ui-button-icon {
+    min-height: 2.75rem;
+    width: 2.75rem;
+    padding: 0;
+  }
+  .ui-card {
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + 0.1rem);
+    background: var(--card);
+  }
+  .ui-input {
+    min-height: 2.75rem;
+    width: 100%;
+    border: 1px solid var(--input);
+    border-radius: var(--radius);
+    background: white;
+    padding-inline: 0.75rem;
+    outline: none;
+  }
+  .ui-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+  .ui-badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+  .ui-badge-primary {
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .ui-badge-secondary {
+    background: var(--secondary-soft);
+    color: color-mix(in srgb, var(--secondary) 55%, black);
+  }
+  .ui-badge-destructive {
+    background: var(--destructive-soft);
+    color: var(--destructive);
+  }
+  .ui-badge-success {
+    background: var(--success-soft);
+    color: var(--success);
+  }
 }

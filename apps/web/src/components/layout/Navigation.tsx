@@ -18,7 +18,7 @@ export function Navigation({ onNavigate }: NavigationProps) {
       {items.map(({ label, to, icon: Icon }) => (
         <NavLink
           className={({ isActive }) =>
-            `flex items-center gap-3 rounded-lg px-3 py-3 transition-colors ${isActive ? 'bg-[#dce9df] font-semibold text-[#234633]' : 'hover:bg-[#f1ede5]'}`
+            `flex items-center gap-3 rounded-lg px-3 py-3 transition-colors ${isActive ? 'bg-[#dce9df] font-semibold text-[var(--primary-hover)]' : 'hover:bg-[#f1ede5]'}`
           }
           key={to}
           onClick={onNavigate}
@@ -35,7 +35,7 @@ export function Navigation({ onNavigate }: NavigationProps) {
 export function Brand() {
   return (
     <div className="flex items-center gap-3 text-lg font-semibold">
-      <span className="grid size-9 place-items-center rounded-xl bg-[#315c45] text-white">
+      <span className="grid size-9 place-items-center rounded-xl bg-[var(--primary)] text-white">
         <Dumbbell aria-hidden="true" size={20} />
       </span>
       <span>نظام إدارة الجيم</span>

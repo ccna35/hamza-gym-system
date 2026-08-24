@@ -1,5 +1,6 @@
 import { Camera, CameraOff, ImagePlus, RefreshCcw } from 'lucide-react';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { Button } from '../ui/Button';
 
 export function PhotoCapture({
   value,
@@ -97,22 +98,14 @@ export function PhotoCapture({
               ref={video}
             />
             <div className="mt-3 flex gap-2">
-              <button
-                className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-[#315c45] px-4 font-semibold text-white"
-                onClick={capture}
-                type="button"
-              >
+              <Button className="flex-1" onClick={capture}>
                 <Camera size={18} />
                 التقاط الصورة
-              </button>
-              <button
-                className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#c7bfb1] px-4"
-                onClick={stopCamera}
-                type="button"
-              >
+              </Button>
+              <Button onClick={stopCamera} variant="outline">
                 <CameraOff size={18} />
                 إلغاء
-              </button>
+              </Button>
             </div>
           </div>
         ) : preview ? (
@@ -124,26 +117,18 @@ export function PhotoCapture({
             />
             <div>
               <p className="font-semibold">الصورة جاهزة للرفع</p>
-              <button
-                className="mt-2 flex min-h-11 items-center gap-2 rounded-lg border border-[#c7bfb1] px-4"
-                onClick={() => onChange(null)}
-                type="button"
-              >
+              <Button className="mt-2" onClick={() => onChange(null)} variant="outline">
                 <RefreshCcw size={17} />
                 اختيار صورة أخرى
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
           <div className="grid gap-2 sm:grid-cols-2">
-            <button
-              className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#e2ebe3] px-4 font-semibold text-[#315c45]"
-              onClick={startCamera}
-              type="button"
-            >
+            <Button onClick={startCamera} variant="secondary">
               <Camera size={18} />
               فتح كاميرا الويب
-            </button>
+            </Button>
             <label className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#c7bfb1] bg-white px-4 font-semibold">
               <ImagePlus size={18} />
               اختيار صورة أو الكاميرا

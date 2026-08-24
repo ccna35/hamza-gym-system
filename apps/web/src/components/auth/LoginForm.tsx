@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ApiError, login } from '../../api/client';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/FormControl';
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -24,9 +26,9 @@ export function LoginForm() {
       <label className="block font-medium" htmlFor="username">
         اسم المستخدم
       </label>
-      <input
+      <Input
         autoComplete="username"
-        className="mt-2 min-h-11 w-full rounded-lg border border-[#b9b2a6] bg-white px-3 outline-none focus:border-[#315c45] focus:ring-2 focus:ring-[#dce9df]"
+        className="mt-2"
         id="username"
         onChange={(event) => setUsername(event.target.value)}
         required
@@ -35,9 +37,9 @@ export function LoginForm() {
       <label className="mt-5 block font-medium" htmlFor="password">
         كلمة المرور
       </label>
-      <input
+      <Input
         autoComplete="current-password"
-        className="mt-2 min-h-11 w-full rounded-lg border border-[#b9b2a6] bg-white px-3 outline-none focus:border-[#315c45] focus:ring-2 focus:ring-[#dce9df]"
+        className="mt-2"
         id="password"
         onChange={(event) => setPassword(event.target.value)}
         required
@@ -51,13 +53,13 @@ export function LoginForm() {
             : 'بيانات الدخول غير صحيحة'}
         </p>
       )}
-      <button
-        className="mt-6 min-h-11 w-full rounded-lg bg-[#315c45] px-4 font-semibold text-white transition-colors hover:bg-[#234633] disabled:cursor-wait disabled:opacity-60"
+      <Button
+        className="mt-6 w-full disabled:cursor-wait"
         disabled={mutation.isPending}
         type="submit"
       >
         {mutation.isPending ? 'جارٍ تسجيل الدخول...' : 'تسجيل الدخول'}
-      </button>
+      </Button>
     </form>
   );
 }

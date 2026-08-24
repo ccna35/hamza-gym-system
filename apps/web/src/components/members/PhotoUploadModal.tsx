@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Upload } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ApiError, uploadMemberPhoto } from '../../api/client';
+import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { PhotoCapture } from './PhotoCapture';
 
@@ -59,23 +60,16 @@ export function PhotoUploadModal({
         </div>
       )}
       <div className="mt-6 flex flex-col-reverse gap-3 border-t border-[#e8e2d7] pt-5 sm:flex-row">
-        <button
-          className="min-h-11 rounded-lg border border-[#c7bfb1] px-5 font-semibold"
-          disabled={mutation.isPending}
-          onClick={onClose}
-          type="button"
-        >
+        <Button disabled={mutation.isPending} onClick={onClose} variant="outline">
           إلغاء
-        </button>
-        <button
-          className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#315c45] px-5 font-semibold text-white disabled:opacity-50"
+        </Button>
+        <Button
           disabled={!photo || mutation.isPending}
           onClick={() => photo && mutation.mutate(photo)}
-          type="button"
         >
           <Upload size={18} />
           {mutation.isPending ? 'جارٍ رفع الصورة...' : 'رفع الصورة'}
-        </button>
+        </Button>
       </div>
     </Modal>
   );

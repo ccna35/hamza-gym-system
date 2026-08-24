@@ -3,6 +3,9 @@ import { CalendarRange, CircleDollarSign, Pencil, Plus, Power, PowerOff } from '
 import { useState } from 'react';
 import { disablePlan, enablePlan, getPlans, Plan } from '../api/client';
 import { PlanFormModal } from '../components/plans/PlanFormModal';
+import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
+import { Card } from '../components/ui/Card';
 import { Modal } from '../components/ui/Modal';
 import {
   EmptyState,
@@ -74,14 +77,10 @@ export function PlansPage() {
           <p className="text-sm text-[#68736b]">أسعار الاشتراكات ومددها المتاحة</p>
           <h1 className="mt-1 text-2xl font-bold">خطط الاشتراك</h1>
         </div>
-        <button
-          className="flex min-h-11 items-center gap-2 rounded-lg bg-[#315c45] px-4 font-semibold text-white hover:bg-[#234633]"
-          onClick={openCreate}
-          type="button"
-        >
+        <Button onClick={openCreate} type="button">
           <Plus size={19} />
           إضافة خطة
-        </button>
+        </Button>
       </header>
       <section className="mt-6 flex flex-wrap items-center gap-2" aria-label="تصفية الخطط">
         {(
@@ -91,9 +90,9 @@ export function PlansPage() {
             ['disabled', 'المعطلة'],
           ] as const
         ).map(([value, label]) => (
-          <button
+          <Button
             aria-pressed={filter === value}
-            className={`min-h-11 rounded-lg px-4 text-sm font-semibold transition ${filter === value ? 'bg-[#315c45] text-white' : 'border border-[#c7bfb1] bg-[#fffdf8] text-[#465249] hover:bg-[#f1ede5]'}`}
+            variant={filter === value ? 'primary' : 'outline'}
             key={value}
             onClick={() => {
               setFilter(value);
@@ -102,7 +101,7 @@ export function PlansPage() {
             type="button"
           >
             {label}
-          </button>
+          </Button>
         ))}
       </section>
       <section className="mt-5">
@@ -123,25 +122,23 @@ export function PlansPage() {
           <>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {query.data.items.map((plan) => (
-                <article
-                  className={`rounded-xl border bg-[#fffdf8] p-5 ${plan.isEnabled ? 'border-[#d9d2c4]' : 'border-[#dfc8c3] opacity-90'}`}
+                <Card
+                  className={`p-5 ${plan.isEnabled ? '' : 'border-[#dfc8c3] opacity-90'}`}
                   key={plan.id}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`grid size-10 place-items-center rounded-xl ${plan.isEnabled ? 'bg-[#e2ebe3] text-[#315c45]' : 'bg-[#eee8e4] text-[#806b65]'}`}
+                          className={`grid size-10 place-items-center rounded-xl ${plan.isEnabled ? 'bg-[var(--primary-soft)] text-[var(--primary)]' : 'bg-[#eee8e4] text-[#806b65]'}`}
                         >
                           <CalendarRange size={20} />
                         </span>
                         <div>
                           <h2 className="truncate text-lg font-bold">{plan.name}</h2>
-                          <span
-                            className={`text-xs font-semibold ${plan.isEnabled ? 'text-[#287044]' : 'text-[#8b4c40]'}`}
-                          >
+                          <Badge variant={plan.isEnabled ? 'success' : 'destructive'}>
                             {plan.isEnabled ? 'مفعلة للاشتراكات الجديدة' : 'معطلة'}
-                          </span>
+                          </Badge>
                         </div>
                       </div>
                     </div>
@@ -151,24 +148,20 @@ export function PlansPage() {
                     <PriceGrid plan={plan} />
                   </div>
                   <div className="mt-5 grid grid-cols-2 gap-2 border-t border-[#e8e2d7] pt-4">
-                    <button
-                      className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#c7bfb1] font-semibold hover:bg-[#f1ede5]"
-                      onClick={() => openEdit(plan)}
-                      type="button"
-                    >
+                    <Button variant="outline" onClick={() => openEdit(plan)} type="button">
                       <Pencil size={17} />
                       تعديل
-                    </button>
-                    <button
-                      className={`flex min-h-11 items-center justify-center gap-2 rounded-lg font-semibold ${plan.isEnabled ? 'border border-[#d09b91] text-[#8b382c] hover:bg-[#fff2ef]' : 'bg-[#315c45] text-white hover:bg-[#234633]'}`}
+                    </Button>
+                    <Button
+                      variant={plan.isEnabled ? 'destructive' : 'primary'}
                       onClick={() => setStatusPlan(plan)}
                       type="button"
                     >
                       {plan.isEnabled ? <PowerOff size={17} /> : <Power size={17} />}
                       {plan.isEnabled ? 'تعطيل' : 'تفعيل'}
-                    </button>
+                    </Button>
                   </div>
-                </article>
+                </Card>
               ))}
             </div>
             <PaginationControls
@@ -186,7 +179,7 @@ export function PlansPage() {
         title={statusPlan?.isEnabled ? 'تعطيل الخطة' : 'تفعيل الخطة'}
       >
         <div
-          className={`grid size-12 place-items-center rounded-xl ${statusPlan?.isEnabled ? 'bg-[#f7e3df] text-[#8b382c]' : 'bg-[#e2ebe3] text-[#315c45]'}`}
+          className={`grid size-12 place-items-center rounded-xl ${statusPlan?.isEnabled ? 'bg-[#f7e3df] text-[#8b382c]' : 'bg-[var(--primary-soft)] text-[var(--primary)]'}`}
         >
           {statusPlan?.isEnabled ? <PowerOff size={23} /> : <Power size={23} />}
         </div>
@@ -206,16 +199,16 @@ export function PlansPage() {
           </p>
         )}
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
-          <button
-            className="min-h-11 rounded-lg border border-[#c7bfb1] px-4 font-semibold"
+          <Button
+            variant="outline"
             disabled={statusMutation.isPending}
             onClick={() => setStatusPlan(null)}
             type="button"
           >
             إلغاء
-          </button>
-          <button
-            className={`min-h-11 rounded-lg px-4 font-semibold text-white disabled:opacity-60 ${statusPlan?.isEnabled ? 'bg-[#9b3d2e]' : 'bg-[#315c45]'}`}
+          </Button>
+          <Button
+            variant={statusPlan?.isEnabled ? 'destructive' : 'primary'}
             disabled={statusMutation.isPending || !statusPlan}
             onClick={() => statusPlan && statusMutation.mutate(statusPlan)}
             type="button"
@@ -225,7 +218,7 @@ export function PlansPage() {
               : statusPlan?.isEnabled
                 ? 'تأكيد التعطيل'
                 : 'تأكيد التفعيل'}
-          </button>
+          </Button>
         </div>
       </Modal>
     </main>

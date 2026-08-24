@@ -4,6 +4,7 @@ import type { Response } from 'express';
 @Catch()
 export class ApiErrorFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
+    console.log('exception', exception);
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
     const status =

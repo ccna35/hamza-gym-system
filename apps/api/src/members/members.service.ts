@@ -38,35 +38,65 @@ export class MembersService {
   ) {}
 
   async list(query: MemberQueryDto) {
-    if (query.subscriptionState && query.subscriptionState !== SubscriptionStateFilter.NONE)
-      return this.emptyPage(query);
-    if (query.hasDebt === true) return this.emptyPage(query);
     const where: Prisma.MemberWhereInput = { isArchived: query.archived };
     if (query.search) {
       const normalized = normalizePhoneSearch(query.search);
       where.OR = [{ name: { contains: query.search, mode: 'insensitive' } }];
       if (normalized) where.OR.push({ phoneNormalized: { contains: normalized } });
     }
-    const [members, totalItems] = await this.prisma.$transaction([
-      this.prisma.member.findMany({
-        where,
-        orderBy: [{ name: 'asc' }, { id: 'asc' }],
-        skip: (query.page - 1) * query.limit,
-        take: query.limit,
-      }),
-      this.prisma.member.count({ where }),
-    ]);
-    return {
-      items: members.map((member) => ({
+    const members = await this.prisma.member.findMany({
+      where,
+      include: {
+        subscriptions: { where: { voidedAt: null }, orderBy: { startDate: 'asc' } },
+        payments: { where: { voidedAt: null } },
+      },
+      orderBy: [{ name: 'asc' }, { id: 'asc' }],
+    });
+    const today = new Date().toISOString().slice(0, 10);
+    const summaries = members.map((member) => {
+      const subscriptions = member.subscriptions ?? [];
+      const payments = member.payments ?? [];
+      const active = subscriptions.find(
+        (item) => dateOnly(item.startDate) <= today && dateOnly(item.endDate) >= today,
+      );
+      const scheduled = subscriptions.find((item) => dateOnly(item.startDate) > today);
+      const latestExpired = [...subscriptions]
+        .filter((item) => dateOnly(item.endDate) < today)
+        .sort((a, b) => b.endDate.getTime() - a.endDate.getTime())[0];
+      const subscriptionState = active
+        ? SubscriptionStateFilter.ACTIVE
+        : scheduled
+          ? SubscriptionStateFilter.SCHEDULED
+          : latestExpired
+            ? SubscriptionStateFilter.EXPIRED
+            : SubscriptionStateFilter.NONE;
+      const displayedSubscription = active ?? scheduled ?? latestExpired;
+      const charges = subscriptions.reduce(
+        (sum, item) => sum + Number(item.agreedPriceMinor),
+        0,
+      );
+      const paid = payments.reduce((sum, item) => sum + Number(item.amountMinor), 0);
+      return {
         id: member.id,
         name: member.name,
         phone: member.phoneDisplay,
         photoUrl: this.photoUrl(member),
         isArchived: member.isArchived,
-        subscriptionState: 'NONE',
-        subscriptionEndDate: null,
-        outstandingBalanceMinor: 0,
-      })),
+        subscriptionState,
+        subscriptionPlanName: displayedSubscription?.planNameSnapshot ?? null,
+        subscriptionEndDate: displayedSubscription ? dateOnly(displayedSubscription.endDate) : null,
+        outstandingBalanceMinor: charges - paid,
+      };
+    });
+    const filtered = summaries.filter(
+      (member) =>
+        (!query.subscriptionState || member.subscriptionState === query.subscriptionState) &&
+        (query.hasDebt === undefined || member.outstandingBalanceMinor > 0 === query.hasDebt),
+    );
+    const totalItems = filtered.length;
+    const items = filtered.slice((query.page - 1) * query.limit, query.page * query.limit);
+    return {
+      items,
       pagination: this.pagination(query.page, query.limit, totalItems),
     };
   }
@@ -108,7 +138,32 @@ export class MembersService {
   }
 
   async get(memberId: string) {
-    return this.detail(await this.requireMember(memberId));
+    const member = await this.prisma.member.findUnique({
+      where: { id: memberId },
+      include: {
+        subscriptions: { where: { voidedAt: null }, orderBy: { startDate: 'asc' } },
+        payments: { where: { voidedAt: null } },
+      },
+    });
+    if (!member)
+      throw new NotFoundException({ code: 'MEMBER_NOT_FOUND', message: 'العضو غير موجود' });
+    const base = this.detail(member);
+    const today = new Date().toISOString().slice(0, 10);
+    const active = member.subscriptions.find(
+      (item) => dateOnly(item.startDate) <= today && dateOnly(item.endDate) >= today,
+    );
+    const next = member.subscriptions.find((item) => dateOnly(item.startDate) > today);
+    const charges = member.subscriptions.reduce(
+      (sum, item) => sum + Number(item.agreedPriceMinor),
+      0,
+    );
+    const paid = member.payments.reduce((sum, item) => sum + Number(item.amountMinor), 0);
+    return {
+      ...base,
+      currentSubscription: active ? this.subscriptionSummary(active, today) : null,
+      nextSubscription: next ? this.subscriptionSummary(next, today) : null,
+      outstandingBalanceMinor: charges - paid,
+    };
   }
 
   async update(memberId: string, input: UpdateMemberDto, actorOwnerId: string, requestId?: string) {
@@ -321,9 +376,6 @@ export class MembersService {
     }
     return resolve(this.photoDirectory, photoKey);
   }
-  private emptyPage(query: PaginationDto) {
-    return { items: [], pagination: this.pagination(query.page, query.limit, 0) };
-  }
   private detail(member: Member) {
     return {
       id: member.id,
@@ -361,5 +413,22 @@ export class MembersService {
     return member.photoKey
       ? `/api/v1/members/${member.id}/photo?v=${member.updatedAt.getTime()}`
       : null;
+  }
+  private subscriptionSummary(
+    item: { id: string; planNameSnapshot: string; startDate: Date; endDate: Date },
+    today: string,
+  ) {
+    return {
+      id: item.id,
+      planNameSnapshot: item.planNameSnapshot,
+      startDate: dateOnly(item.startDate),
+      endDate: dateOnly(item.endDate),
+      state:
+        dateOnly(item.startDate) > today
+          ? 'SCHEDULED'
+          : dateOnly(item.endDate) < today
+            ? 'EXPIRED'
+            : 'ACTIVE',
+    };
   }
 }

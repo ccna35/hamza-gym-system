@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import { PropsWithChildren, useEffect } from 'react';
+import { Button } from './Button';
 
 interface ModalProps extends PropsWithChildren {
   title: string;
@@ -47,14 +48,9 @@ export function Modal({ title, isOpen, onClose, children, size = 'sm' }: ModalPr
           <h2 className="text-lg font-semibold" id="modal-title">
             {title}
           </h2>
-          <button
-            aria-label="إغلاق النافذة"
-            className="rounded-lg p-2 text-[#59665d] hover:bg-[#f1ede5]"
-            onClick={onClose}
-            type="button"
-          >
+          <Button aria-label="إغلاق النافذة" onClick={onClose} size="icon" variant="ghost">
             <X aria-hidden="true" size={20} />
-          </button>
+          </Button>
         </div>
         <div className="pt-5">{children}</div>
       </section>

@@ -1,6 +1,7 @@
 import { LogOut, Menu, X } from 'lucide-react';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { Brand, Navigation } from './Navigation';
+import { Button } from '../ui/Button';
 
 interface AppShellProps extends PropsWithChildren {
   onLogout: () => void;
@@ -35,48 +36,48 @@ export function AppShell({ children, onLogout, isLoggingOut }: AppShellProps) {
           <aside className="relative h-full w-[min(85vw,320px)] border-l border-[#d9d2c4] bg-[#fffdf8] p-5 shadow-2xl">
             <div className="flex items-center justify-between gap-4">
               <Brand />
-              <button
+              <Button
                 aria-label="إغلاق القائمة"
-                className="rounded-lg p-2 hover:bg-[#f1ede5]"
                 onClick={() => setIsMenuOpen(false)}
-                type="button"
+                size="icon"
+                variant="ghost"
               >
                 <X aria-hidden="true" size={21} />
-              </button>
+              </Button>
             </div>
             <Navigation onNavigate={() => setIsMenuOpen(false)} />
-            <button
-              className="mt-8 flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-3 text-[#9b3d2e] hover:bg-[#f9e9e5]"
+            <Button
+              className="mt-8 w-full justify-start"
               disabled={isLoggingOut}
               onClick={onLogout}
-              type="button"
+              variant="ghost"
             >
               <LogOut aria-hidden="true" size={19} /> تسجيل الخروج
-            </button>
+            </Button>
           </aside>
         </div>
       )}
 
       <div className="lg:mr-64">
         <header className="flex h-16 items-center justify-between border-b border-[#d9d2c4] bg-[#fffdf8] px-4 lg:hidden">
-          <button
+          <Button
             aria-label="فتح القائمة"
-            className="rounded-lg p-2 hover:bg-[#f1ede5]"
             onClick={() => setIsMenuOpen(true)}
-            type="button"
+            size="icon"
+            variant="ghost"
           >
             <Menu aria-hidden="true" size={22} />
-          </button>
+          </Button>
           <span className="font-semibold">لوحة الإدارة</span>
-          <button
+          <Button
             aria-label="تسجيل الخروج"
-            className="rounded-lg p-2 text-[#9b3d2e] hover:bg-[#f9e9e5]"
             disabled={isLoggingOut}
             onClick={onLogout}
-            type="button"
+            size="icon"
+            variant="ghost"
           >
             <LogOut aria-hidden="true" size={19} />
-          </button>
+          </Button>
         </header>
         {children}
       </div>

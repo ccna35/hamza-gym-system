@@ -92,9 +92,39 @@ model Member {
   archivedAt      DateTime?    @db.Timestamptz(3)
   createdAt       DateTime     @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime     @updatedAt @db.Timestamptz(3)
+  subscriptions   Subscription[]
+  payments        Payment[]
 
   @@index([isArchived, name])
   @@index([joinDate])
+}
+
+enum PaymentMethod {
+  CASH
+}
+
+model Payment {
+  id                       String        @id @default(uuid()) @db.Uuid
+  memberId                 String        @db.Uuid
+  amountMinor              BigInt
+  balanceAfterPaymentMinor BigInt
+  paymentDate              DateTime      @db.Date
+  paymentMethod            PaymentMethod @default(CASH)
+  receiptNumber            String        @unique @db.VarChar(32)
+  verificationToken        String        @unique @db.VarChar(32)
+  voidedAt                 DateTime?      @db.Timestamptz(3)
+  voidReason               String?       @db.Text
+  createdAt                DateTime       @default(now()) @db.Timestamptz(3)
+  member                   Member         @relation(fields: [memberId], references: [id], onDelete: Restrict)
+
+  @@index([memberId, paymentDate(sort: Desc), createdAt(sort: Desc)])
+  @@index([paymentDate])
+}
+
+model SystemCounter {
+  key       String   @id @db.VarChar(64)
+  nextValue BigInt
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 }
 
 model Plan {
@@ -104,8 +134,32 @@ model Plan {
   createdAt DateTime    @default(now()) @db.Timestamptz(3)
   updatedAt DateTime    @updatedAt @db.Timestamptz(3)
   prices    PlanPrice[]
+  subscriptions Subscription[]
 
   @@index([isEnabled])
+}
+
+model Subscription {
+  id                String   @id @default(uuid()) @db.Uuid
+  memberId          String   @db.Uuid
+  planId            String   @db.Uuid
+  planNameSnapshot  String   @db.VarChar(100)
+  durationMonths    Int      @db.SmallInt
+  listedPriceMinor  BigInt
+  agreedPriceMinor  BigInt
+  startDate         DateTime @db.Date
+  endDate           DateTime @db.Date
+  voidedAt          DateTime? @db.Timestamptz(3)
+  voidReason        String?  @db.Text
+  createdAt         DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(3)
+  member            Member   @relation(fields: [memberId], references: [id], onDelete: Restrict)
+  plan              Plan     @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([memberId])
+  @@index([memberId, startDate(sort: Desc)])
+  @@index([startDate])
+  @@index([endDate])
 }
 
 model PlanPrice {

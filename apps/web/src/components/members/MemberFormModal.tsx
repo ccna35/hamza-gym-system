@@ -3,6 +3,8 @@ import { Save } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
 import { ApiError, createMember, MemberDetail, MemberInput, updateMember } from '../../api/client';
 import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
+import { Input, Select } from '../ui/FormControl';
 
 const today = new Date().toISOString().slice(0, 10);
 const empty: MemberInput = {
@@ -14,8 +16,7 @@ const empty: MemberInput = {
   weightKg: null,
   joinDate: today,
 };
-const inputClass =
-  'mt-1 min-h-11 w-full rounded-lg border border-[#c7bfb1] bg-white px-3 outline-none focus:border-[#315c45] focus:ring-2 focus:ring-[#315c45]/20';
+const inputClass = 'mt-1';
 
 export function MemberFormModal({
   isOpen,
@@ -87,7 +88,7 @@ export function MemberFormModal({
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="sm:col-span-2">
             <span className="font-medium">اسم العضو</span>
-            <input
+            <Input
               autoFocus
               className={inputClass}
               maxLength={150}
@@ -99,7 +100,7 @@ export function MemberFormModal({
           </label>
           <label>
             <span className="font-medium">رقم الهاتف</span>
-            <input
+            <Input
               className={inputClass}
               dir="ltr"
               inputMode="tel"
@@ -111,18 +112,18 @@ export function MemberFormModal({
           </label>
           <label>
             <span className="font-medium">النوع</span>
-            <select
+            <Select
               className={inputClass}
               onChange={(e) => set('gender', e.target.value as MemberInput['gender'])}
               value={form.gender}
             >
               <option value="MALE">ذكر</option>
               <option value="FEMALE">أنثى</option>
-            </select>
+            </Select>
           </label>
           <label>
             <span className="font-medium">تاريخ الميلاد</span>
-            <input
+            <Input
               className={inputClass}
               max={today}
               onChange={(e) => set('dateOfBirth', e.target.value)}
@@ -133,7 +134,7 @@ export function MemberFormModal({
           </label>
           <label>
             <span className="font-medium">تاريخ الانضمام</span>
-            <input
+            <Input
               className={inputClass}
               onChange={(e) => set('joinDate', e.target.value)}
               required
@@ -145,7 +146,7 @@ export function MemberFormModal({
             <span className="font-medium">
               الطول (سم) <small className="text-[#68736b]">اختياري</small>
             </span>
-            <input
+            <Input
               className={inputClass}
               max="300"
               min="0.01"
@@ -159,7 +160,7 @@ export function MemberFormModal({
             <span className="font-medium">
               الوزن (كجم) <small className="text-[#68736b]">اختياري</small>
             </span>
-            <input
+            <Input
               className={inputClass}
               max="500"
               min="0.01"
@@ -179,21 +180,13 @@ export function MemberFormModal({
           </div>
         )}
         <div className="mt-6 flex flex-col-reverse gap-3 border-t border-[#e8e2d7] pt-5 sm:flex-row">
-          <button
-            className="min-h-11 rounded-lg border border-[#c7bfb1] px-5 font-semibold"
-            disabled={mutation.isPending}
-            onClick={onClose}
-            type="button"
-          >
+          <Button variant="outline" disabled={mutation.isPending} onClick={onClose} type="button">
             إلغاء
-          </button>
-          <button
-            className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#315c45] px-5 font-semibold text-white disabled:opacity-60"
-            disabled={mutation.isPending}
-          >
+          </Button>
+          <Button disabled={mutation.isPending} type="submit">
             <Save size={18} />
             {mutation.isPending ? 'جارٍ الحفظ...' : 'حفظ البيانات'}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

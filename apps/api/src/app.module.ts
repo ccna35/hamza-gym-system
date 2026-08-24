@@ -15,6 +15,9 @@ import { MembersModule } from './members/members.module';
 import { DatabaseModule } from './database/database.module';
 import { AuditModule } from './audit/audit.module';
 import { PlansModule } from './plans/plans.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { PaymentsModule } from './payments/payments.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -27,6 +30,9 @@ import { PlansModule } from './plans/plans.module';
     DatabaseModule,
     AuditModule,
     PlansModule,
+    SubscriptionsModule,
+    PaymentsModule,
+    DashboardModule,
   ],
   controllers: [HealthController, AuthController],
   providers: [PasswordService, SessionService, AuthGuard, AuthService, LoginRateLimiterService],

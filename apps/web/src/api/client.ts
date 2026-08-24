@@ -81,6 +81,7 @@ export type MemberListItem = {
   photoUrl: string | null;
   isArchived: boolean;
   subscriptionState: 'NONE' | 'SCHEDULED' | 'ACTIVE' | 'EXPIRED';
+  subscriptionPlanName: string | null;
   subscriptionEndDate: string | null;
   outstandingBalanceMinor: number;
 };
@@ -234,4 +235,127 @@ export function enablePlan(planId: string) {
 }
 export function disablePlan(planId: string) {
   return request<Plan>(`/plans/${planId}/disable`, { method: 'POST' });
+}
+
+export type Subscription = {
+  id: string;
+  memberId: string;
+  planId: string;
+  planNameSnapshot: string;
+  durationMonths: 1 | 3 | 6 | 12;
+  listedPriceMinor: number;
+  agreedPriceMinor: number;
+  startDate: string;
+  endDate: string;
+  state: 'SCHEDULED' | 'ACTIVE' | 'EXPIRED' | 'VOIDED';
+  voidedAt: string | null;
+  voidReason: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+export type InitialPaymentInput = { amountMinor: number; paymentDate: string };
+export type SubscriptionInput = {
+  planId: string;
+  durationMonths: 1 | 3 | 6 | 12;
+  startDate?: string;
+  agreedPriceMinor: number;
+  initialPayment?: InitialPaymentInput;
+};
+export function getSubscriptions(memberId: string) {
+  return request<{ items: Subscription[]; pagination: Pagination }>(
+    `/members/${memberId}/subscriptions?limit=100`,
+  );
+}
+export function createSubscription(memberId: string, input: SubscriptionInput) {
+  return request<{
+    subscription: Subscription;
+    initialPayment: Payment | null;
+    outstandingBalanceMinor: number;
+  }>(`/members/${memberId}/subscriptions`, { method: 'POST', body: JSON.stringify(input) });
+}
+export function renewSubscription(memberId: string, input: Omit<SubscriptionInput, 'startDate'>) {
+  return request<{
+    subscription: Subscription;
+    initialPayment: Payment | null;
+    outstandingBalanceMinor: number;
+  }>(`/members/${memberId}/subscriptions/renew`, { method: 'POST', body: JSON.stringify(input) });
+}
+export function voidSubscription(subscriptionId: string, reason: string) {
+  return request<Subscription>(`/subscriptions/${subscriptionId}/void`, {
+    method: 'POST',
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export type Payment = {
+  id: string;
+  memberId: string;
+  amountMinor: number;
+  paymentDate: string;
+  paymentMethod: 'CASH';
+  receiptNumber: string;
+  balanceAfterPaymentMinor: number;
+  status: 'VALID' | 'VOIDED';
+  voidedAt: string | null;
+  voidReason: string | null;
+  createdAt: string;
+};
+export function getPayments(memberId: string) {
+  return request<{ items: Payment[]; pagination: Pagination }>(
+    `/members/${memberId}/payments?limit=100`,
+  );
+}
+export function createPayment(
+  memberId: string,
+  input: { amountMinor: number; paymentDate: string },
+) {
+  return request<Payment>(`/members/${memberId}/payments`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+export function voidPayment(paymentId: string, reason: string) {
+  return request<Payment>(`/payments/${paymentId}/void`, {
+    method: 'POST',
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export type DashboardSummary = {
+  activeMembers: number;
+  expiredMemberships: number;
+  expiringWithin7Days: number;
+  newMembersThisMonth: number;
+  revenueTodayMinor: number;
+  revenueThisMonthMinor: number;
+  totalOutstandingDebtMinor: number;
+};
+export type DashboardDebtor = {
+  memberId: string;
+  name: string;
+  phone: string;
+  isArchived: boolean;
+  outstandingBalanceMinor: number;
+};
+export type DashboardExpiring = {
+  memberId: string;
+  memberName: string;
+  phone: string;
+  subscriptionId: string;
+  planName: string;
+  endDate: string;
+  daysRemaining: number;
+};
+export function getDashboardSummary() {
+  return request<DashboardSummary>('/dashboard/summary');
+}
+export function getDashboardDebtors(limit = 6) {
+  return request<{ items: DashboardDebtor[]; pagination: Pagination }>(
+    `/dashboard/debtors${queryString({ page: 1, limit, sort: 'balance_desc' })}`,
+  );
+}
+export function getDashboardExpiring(limit = 6) {
+  return request<{ items: DashboardExpiring[]; pagination: Pagination }>(
+    `/dashboard/expiring${queryString({ page: 1, limit })}`,
+  );
 }

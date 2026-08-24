@@ -19,7 +19,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard, RequestWithOwner } from '../auth/auth.guard';
 import { CreateMemberDto } from './dto/create-member.dto';
-import { MemberQueryDto, PaginationDto } from './dto/member-query.dto';
+import { MemberQueryDto } from './dto/member-query.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
 import { MembersService } from './members.service';
 
@@ -86,22 +86,6 @@ export class MembersController {
   @Header('Cache-Control', 'private, max-age=300')
   async getPhoto(@Param('memberId', new ParseUUIDPipe()) memberId: string) {
     return new StreamableFile(await this.members.getPhoto(memberId));
-  }
-
-  @Get(':memberId/subscriptions')
-  subscriptions(
-    @Param('memberId', new ParseUUIDPipe()) memberId: string,
-    @Query() query: PaginationDto,
-  ) {
-    return this.members.emptyHistory(memberId, query);
-  }
-
-  @Get(':memberId/payments')
-  payments(
-    @Param('memberId', new ParseUUIDPipe()) memberId: string,
-    @Query() query: PaginationDto,
-  ) {
-    return this.members.emptyHistory(memberId, query);
   }
 
   private requestId(request: RequestWithOwner) {

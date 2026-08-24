@@ -3,6 +3,8 @@ import { BadgeDollarSign, Save } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
 import { ApiError, createPlan, Plan, PlanInput, updatePlan } from '../../api/client';
 import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/FormControl';
 
 const durations = [1, 3, 6, 12] as const;
 const durationLabels = { 1: 'شهر واحد', 3: '3 أشهر', 6: '6 أشهر', 12: '12 شهراً' };
@@ -86,7 +88,7 @@ export function PlanFormModal({
     >
       <form onSubmit={submit}>
         <div className="rounded-xl bg-[#eef3ee] p-4">
-          <div className="flex items-center gap-2 font-semibold text-[#315c45]">
+          <div className="flex items-center gap-2 font-semibold text-[var(--primary)]">
             <BadgeDollarSign size={19} />
             الأسعار بالجنيه المصري
           </div>
@@ -96,9 +98,9 @@ export function PlanFormModal({
         </div>
         <label className="mt-5 block">
           <span className="font-medium">اسم الخطة</span>
-          <input
+          <Input
             autoFocus
-            className="mt-1 min-h-11 w-full rounded-lg border border-[#c7bfb1] bg-white px-3 outline-none focus:border-[#315c45] focus:ring-2 focus:ring-[#315c45]/20"
+            className="mt-1"
             maxLength={100}
             minLength={2}
             onChange={(event) => setName(event.target.value)}
@@ -111,10 +113,10 @@ export function PlanFormModal({
             <label htmlFor={`plan-price-${duration}`} key={duration}>
               <span className="font-medium">{durationLabels[duration]}</span>
               <div className="relative mt-1">
-                <input
+                <Input
                   aria-label={durationLabels[duration]}
                   id={`plan-price-${duration}`}
-                  className="min-h-11 w-full rounded-lg border border-[#c7bfb1] bg-white pr-3 pl-14 text-left outline-none focus:border-[#315c45] focus:ring-2 focus:ring-[#315c45]/20"
+                  className="pr-3 pl-14 text-left"
                   dir="ltr"
                   inputMode="decimal"
                   onChange={(event) =>
@@ -140,21 +142,13 @@ export function PlanFormModal({
           </div>
         )}
         <div className="mt-6 flex flex-col-reverse gap-3 border-t border-[#e8e2d7] pt-5 sm:flex-row">
-          <button
-            className="min-h-11 rounded-lg border border-[#c7bfb1] px-5 font-semibold"
-            disabled={mutation.isPending}
-            onClick={onClose}
-            type="button"
-          >
+          <Button variant="outline" disabled={mutation.isPending} onClick={onClose} type="button">
             إلغاء
-          </button>
-          <button
-            className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#315c45] px-5 font-semibold text-white disabled:opacity-60"
-            disabled={mutation.isPending}
-          >
+          </Button>
+          <Button disabled={mutation.isPending} type="submit">
             <Save size={18} />
             {mutation.isPending ? 'جارٍ الحفظ...' : 'حفظ الخطة'}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

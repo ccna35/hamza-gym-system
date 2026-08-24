@@ -1,6 +1,7 @@
 import { MemberGender, Prisma } from '@prisma/client';
 import { describe, expect, it, vi } from 'vitest';
 import { MembersService } from './members.service';
+import { SubscriptionStateFilter } from './dto/member-query.dto';
 
 const member = {
   id: '11111111-1111-4111-8111-111111111111',
@@ -72,8 +73,7 @@ describe('MembersService', () => {
 
   it('lists members with normalized partial-phone search and pagination', async () => {
     const { prisma, service } = setup();
-    prisma.member.findMany.mockResolvedValue([member]);
-    prisma.member.count.mockResolvedValue(1);
+    prisma.member.findMany.mockResolvedValue([{ ...member, subscriptions: [], payments: [] }]);
     const result = await service.list({ page: 1, limit: 20, archived: false, search: '+20101' });
     expect(prisma.member.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -90,13 +90,47 @@ describe('MembersService', () => {
 
   it('returns an empty current-state result for filters requiring financial tables', async () => {
     const { prisma, service } = setup();
+    prisma.member.findMany.mockResolvedValue([{ ...member, subscriptions: [], payments: [] }]);
     await expect(
       service.list({ page: 1, limit: 20, archived: false, hasDebt: true }),
     ).resolves.toEqual({
       items: [],
       pagination: { page: 1, limit: 20, totalItems: 0, totalPages: 0 },
     });
-    expect(prisma.member.findMany).not.toHaveBeenCalled();
+    expect(prisma.member.findMany).toHaveBeenCalled();
+  });
+
+  it('derives active subscription, plan, end date, and debt for member summaries', async () => {
+    const { prisma, service } = setup();
+    prisma.member.findMany.mockResolvedValue([
+      {
+        ...member,
+        subscriptions: [
+          {
+            startDate: new Date('2026-08-01Z'),
+            endDate: new Date('2026-09-30Z'),
+            planNameSnapshot: 'الخطة الذهبية',
+            agreedPriceMinor: 10000n,
+          },
+        ],
+        payments: [{ amountMinor: 4000n }],
+      },
+    ]);
+    const result = await service.list({
+      page: 1,
+      limit: 20,
+      archived: false,
+      subscriptionState: SubscriptionStateFilter.ACTIVE,
+      hasDebt: true,
+    });
+    expect(result.items[0]).toEqual(
+      expect.objectContaining({
+        subscriptionState: 'ACTIVE',
+        subscriptionPlanName: 'الخطة الذهبية',
+        subscriptionEndDate: '2026-09-30',
+        outstandingBalanceMinor: 6000,
+      }),
+    );
   });
 
   it('does not create a meaningless audit row for an empty patch', async () => {

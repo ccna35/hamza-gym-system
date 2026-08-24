@@ -8,6 +8,9 @@ import {
   LoadingState,
   PaginationControls,
 } from '../components/ui/PageState';
+import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
+import { Input, Select } from '../components/ui/FormControl';
 
 const entityLabels: Record<AuditEntityType, string> = {
   MEMBER: 'عضو',
@@ -72,9 +75,7 @@ function AuditCard({ item }: { item: AuditLogItem }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-[#e2ebe3] px-2.5 py-1 text-xs font-semibold text-[#315c45]">
-              {entityLabels[item.entityType]}
-            </span>
+            <Badge variant="primary">{entityLabels[item.entityType]}</Badge>
             <h2 className="font-semibold">{actionLabels[item.action]}</h2>
           </div>
           <p className="mt-2 text-xs text-[#78827b]" dir="ltr">
@@ -88,14 +89,16 @@ function AuditCard({ item }: { item: AuditLogItem }) {
         </time>
       </div>
       {hasDetails && (
-        <button
+        <Button
           aria-expanded={expanded}
-          className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#d4cdc0] text-sm font-semibold text-[#315c45]"
+          className="mt-3 w-full"
           onClick={() => setExpanded((value) => !value)}
+          size="sm"
+          variant="outline"
         >
           {expanded ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
           {expanded ? 'إخفاء التفاصيل' : 'عرض قبل وبعد'}
-        </button>
+        </Button>
       )}
       {expanded && (
         <div className="mt-3 grid gap-3 lg:grid-cols-2">
@@ -147,8 +150,8 @@ export function AuditLogsPage() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <label>
             <span className="text-sm text-[#59665d]">نوع السجل</span>
-            <select
-              className="mt-1 min-h-11 w-full rounded-lg border border-[#c7bfb1] bg-white px-3"
+            <Select
+              className="mt-1"
               onChange={(e) => change(setEntityType)(e.target.value)}
               value={entityType}
             >
@@ -158,12 +161,12 @@ export function AuditLogsPage() {
                   {label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label>
             <span className="text-sm text-[#59665d]">نوع العملية</span>
-            <select
-              className="mt-1 min-h-11 w-full rounded-lg border border-[#c7bfb1] bg-white px-3"
+            <Select
+              className="mt-1"
               onChange={(e) => change(setAction)(e.target.value)}
               value={action}
             >
@@ -173,12 +176,12 @@ export function AuditLogsPage() {
                   {label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label>
             <span className="text-sm text-[#59665d]">من تاريخ</span>
-            <input
-              className="mt-1 min-h-11 w-full rounded-lg border border-[#c7bfb1] bg-white px-3"
+            <Input
+              className="mt-1"
               max={to || undefined}
               onChange={(e) => change(setFrom)(e.target.value)}
               type="date"
@@ -187,8 +190,8 @@ export function AuditLogsPage() {
           </label>
           <label>
             <span className="text-sm text-[#59665d]">إلى تاريخ</span>
-            <input
-              className="mt-1 min-h-11 w-full rounded-lg border border-[#c7bfb1] bg-white px-3"
+            <Input
+              className="mt-1"
               min={from || undefined}
               onChange={(e) => change(setTo)(e.target.value)}
               type="date"
