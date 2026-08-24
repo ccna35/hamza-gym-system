@@ -1,26 +1,37 @@
 @import 'tailwindcss';
 
 :root {
-  /* Brand theme — change these two values to recolor the application. */
-  --primary: #315c45;
-  --secondary: #d4a95b;
+  /* Brand — Deep Navy + Warm Amber */
+  --primary: #243b53;
+  --secondary: #d89b45;
 
-  /* Semantic tokens derived from the brand palette. */
-  --primary-hover: color-mix(in srgb, var(--primary) 82%, black);
-  --primary-soft: color-mix(in srgb, var(--primary) 12%, white);
-  --secondary-soft: color-mix(in srgb, var(--secondary) 22%, white);
-  --background: #f4f0e8;
-  --foreground: #17221d;
-  --card: #fffdf8;
-  --muted: #f1ede5;
-  --muted-foreground: #68736b;
-  --border: #d9d2c4;
-  --input: #c7bfb1;
-  --destructive: #9b3d2e;
-  --destructive-soft: #f7e3df;
-  --success: #27613f;
-  --success-soft: #dcecdf;
+  /* Brand states */
+  --primary-hover: #1b2f43;
+  --primary-soft: #e8eef3;
+  --secondary-soft: #fbf1e2;
+
+  /* Surfaces */
+  --background: #f5f7f9;
+  --foreground: #17212b;
+
+  --card: #ffffff;
+
+  --muted: #eef2f5;
+  --muted-foreground: #667785;
+
+  /* Borders / Inputs */
+  --border: #dce3e8;
+  --input: #cbd5dc;
+
+  /* Semantic */
+  --destructive: #b5473c;
+  --destructive-soft: #fbe9e7;
+
+  --success: #287a55;
+  --success-soft: #e2f2e9;
+
   --radius: 0.65rem;
+
   font-family: system-ui, sans-serif;
   color: var(--foreground);
   background: var(--background);
@@ -49,7 +60,7 @@ a {
 
 @layer components {
   .ui-button {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50 cursor-pointer;
   }
   .ui-button-primary {
     background: var(--primary);

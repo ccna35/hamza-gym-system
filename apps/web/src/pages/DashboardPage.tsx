@@ -64,10 +64,6 @@ export function DashboardPage() {
               <UserPlus size={18} />
               إضافة عضو
             </Button>
-            <Link className={buttonClassName({ variant: 'outline' })} to="/members">
-              <WalletCards size={18} />
-              تسجيل دفعة
-            </Link>
           </div>
         </header>
         {owner.mustChangePassword && (

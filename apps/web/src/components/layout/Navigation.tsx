@@ -9,7 +9,6 @@ const items = [
   { label: 'لوحة التحكم', to: '/', icon: BarChart3 },
   { label: 'الأعضاء', to: '/members', icon: Users },
   { label: 'الخطط', to: '/plans', icon: ClipboardList },
-  { label: 'سجل العمليات', to: '/audit-logs', icon: ScrollText },
 ];
 
 export function Navigation({ onNavigate }: NavigationProps) {
