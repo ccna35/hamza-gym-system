@@ -13,6 +13,7 @@ import {
   LoadingState,
   PaginationControls,
 } from '../components/ui/PageState';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 
 const stateLabels = {
   NONE: 'لا يوجد اشتراك',
@@ -85,14 +86,15 @@ export function MembersPage() {
   const [state, setState] = useState('');
   const [debt, setDebt] = useState('');
   const [page, setPage] = useState(1);
+  const debouncedSearch = useDebouncedValue(search.trim(), 300);
   const query = useQuery({
-    queryKey: ['members', search, archived, state, debt, page],
+    queryKey: ['members', debouncedSearch, archived, state, debt, page],
     queryFn: () =>
       getMembers({
         archived,
         page,
         limit: 20,
-        ...(search ? { search } : {}),
+        ...(debouncedSearch ? { search: debouncedSearch } : {}),
         ...(state ? { subscriptionState: state } : {}),
         ...(debt ? { hasDebt: debt === 'true' } : {}),
       }),

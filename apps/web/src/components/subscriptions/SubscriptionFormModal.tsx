@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FormEvent, SubmitEvent, useMemo, useState } from 'react';
+import { SubmitEvent, useMemo, useState } from 'react';
 import { ApiError, createSubscription, getPlans, renewSubscription } from '../../api/client';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -56,15 +56,13 @@ export function SubscriptionFormModal({ memberId, renewal, isOpen, onClose }: Pr
     setPlanId(id);
     const plan = plans.data?.items.find((item) => item.id === id);
     setPrice(
-      (plan?.prices.find((price) => price.durationMonths === durationMonths)?.priceMinor ?? 0) 
+      plan?.prices.find((price) => price.durationMonths === durationMonths)?.priceMinor ?? 0,
     );
   };
   const chooseDuration = (value: number) => {
     const duration = value as (typeof durations)[number];
     setDuration(duration);
-    setPrice(
-      (selected?.prices.find((price) => price.durationMonths === duration)?.priceMinor ?? 0) ,
-    );
+    setPrice(selected?.prices.find((price) => price.durationMonths === duration)?.priceMinor ?? 0);
   };
   const submit = (event: SubmitEvent) => {
     event.preventDefault();
