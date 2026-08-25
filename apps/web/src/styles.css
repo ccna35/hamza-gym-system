@@ -60,7 +60,7 @@ a {
 
 @layer components {
   .ui-button {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50 cursor-pointer;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 py-0 text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50 cursor-pointer;
   }
   .ui-button-primary {
     background: var(--primary);

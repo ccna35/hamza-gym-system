@@ -20,9 +20,20 @@ export function AppShell({ children, onLogout, isLoggingOut }: AppShellProps) {
 
   return (
     <div className="min-h-screen bg-[#f4f0e8] text-[#17221d]">
-      <aside className="fixed inset-y-0 right-0 hidden w-64 border-l border-[#d9d2c4] bg-[#fffdf8] p-6 lg:block">
-        <Brand />
-        <Navigation />
+      <aside className="fixed inset-y-0 right-0 hidden w-64 flex-col border-l border-[#d9d2c4] bg-[#fffdf8] p-6 lg:flex">
+        <div>
+          <Brand />
+          <Navigation />
+        </div>
+        <Button
+          className="mt-auto w-full justify-start"
+          disabled={isLoggingOut}
+          onClick={onLogout}
+          variant="ghost"
+        >
+          <LogOut aria-hidden="true" size={19} />
+          {isLoggingOut ? 'جارٍ تسجيل الخروج...' : 'تسجيل الخروج'}
+        </Button>
       </aside>
 
       {isMenuOpen && (
@@ -69,15 +80,7 @@ export function AppShell({ children, onLogout, isLoggingOut }: AppShellProps) {
             <Menu aria-hidden="true" size={22} />
           </Button>
           <span className="font-semibold">لوحة الإدارة</span>
-          <Button
-            aria-label="تسجيل الخروج"
-            disabled={isLoggingOut}
-            onClick={onLogout}
-            size="icon"
-            variant="ghost"
-          >
-            <LogOut aria-hidden="true" size={19} />
-          </Button>
+          <span aria-hidden="true" className="size-10" />
         </header>
         {children}
       </div>

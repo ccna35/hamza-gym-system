@@ -206,7 +206,7 @@ export function MembersPage() {
                   {query.data.items.map((member) => (
                     <tr className="border-t border-[#e8e2d7]" key={member.id}>
                       <td className="p-4">
-                        <div className="flex items-center gap-3">
+                        <Link className="flex items-center gap-3" to={`/members/${member.id}`}>
                           <MemberAvatar name={member.name} photoUrl={member.photoUrl} />
                           <div>
                             <p className="font-semibold">{member.name}</p>
@@ -214,7 +214,7 @@ export function MembersPage() {
                               {member.phone}
                             </p>
                           </div>
-                        </div>
+                        </Link>
                       </td>
                       <td className="p-4">
                         <div className="space-y-1.5">
@@ -233,14 +233,6 @@ export function MembersPage() {
                         className={`p-4 font-semibold ${member.outstandingBalanceMinor > 0 ? 'text-[#9b3d2e]' : ''}`}
                       >
                         {money(member.outstandingBalanceMinor)}
-                      </td>
-                      <td className="p-4">
-                        <Link
-                          className="font-semibold text-[var(--primary)] hover:underline"
-                          to={`/members/${member.id}`}
-                        >
-                          فتح الملف
-                        </Link>
                       </td>
                     </tr>
                   ))}

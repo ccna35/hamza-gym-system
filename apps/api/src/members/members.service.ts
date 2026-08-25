@@ -371,6 +371,7 @@ export class MembersService {
         message: 'صورة العضو غير موجودة',
       });
     }
+
     return resolve(this.photoDirectory, photoKey);
   }
   private detail(member: Member) {

@@ -32,6 +32,7 @@ describe('authentication experience', () => {
   beforeEach(() => {
     window.history.pushState({}, '', '/login');
     api.login.mockReset();
+    api.logout.mockReset().mockResolvedValue(undefined);
     api.getCurrentOwner.mockReset();
     api.getHealth.mockReset().mockResolvedValue({ status: 'ok', database: 'ok' });
     api.getDashboardSummary.mockReset().mockResolvedValue({
@@ -88,5 +89,20 @@ describe('authentication experience', () => {
     render(<App />);
     expect(await screen.findByText('غيّر كلمة المرور المؤقتة')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'نظرة عامة على الصالة' })).toBeInTheDocument();
+  });
+
+  it('logs out from the desktop sidebar', async () => {
+    window.history.pushState({}, '', '/');
+    api.getCurrentOwner.mockResolvedValue({
+      owner: { id: '1', username: 'owner', mustChangePassword: false },
+    });
+    const user = userEvent.setup();
+    render(<App />);
+
+    const logoutButtons = await screen.findAllByRole('button', { name: 'تسجيل الخروج' });
+    await user.click(logoutButtons[0]!);
+
+    expect(api.logout).toHaveBeenCalledOnce();
+    expect(await screen.findByRole('button', { name: 'تسجيل الدخول' })).toBeInTheDocument();
   });
 });
