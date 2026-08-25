@@ -169,10 +169,6 @@ export function MembersPage() {
             </Select>
           </label>
         </div>
-        <div className="mt-3 flex items-center gap-2 text-xs text-[#68736b]">
-          <Filter size={15} />
-          تتحدث النتائج تلقائياً عند تغيير الفلاتر
-        </div>
       </section>
       <section className="mt-5">
         {query.isPending ? (
