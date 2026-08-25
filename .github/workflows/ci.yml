@@ -7,6 +7,7 @@ on:
 jobs:
   quality:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:16-alpine
@@ -21,26 +22,39 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
+
     env:
       DATABASE_URL: postgresql://gym:gym_test_password@localhost:5432/gym_test
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
-      - name: Enable Corepack
-        run: corepack enable
+
       - name: Install dependencies
-        run: corepack pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+
       - name: Check formatting
-        run: corepack pnpm format-check
+        run: pnpm format-check
+
       - name: Lint
-        run: corepack pnpm lint
+        run: pnpm lint
+
       - name: Typecheck
-        run: corepack pnpm typecheck
+        run: pnpm typecheck
+
       - name: Test
-        run: corepack pnpm test
+        run: pnpm test
+
       - name: Build
-        run: corepack pnpm build
+        run: pnpm build
