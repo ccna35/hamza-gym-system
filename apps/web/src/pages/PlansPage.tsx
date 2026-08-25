@@ -54,9 +54,7 @@ export function PlansPage() {
   const statusMutation = useMutation({
     mutationFn: (plan: Plan) => (plan.isEnabled ? disablePlan(plan.id) : enablePlan(plan.id)),
     onSuccess: async () => {
-      await Promise.all([
-        client.invalidateQueries({ queryKey: ['plans'] }),
-      ]);
+      await Promise.all([client.invalidateQueries({ queryKey: ['plans'] })]);
       setStatusPlan(null);
     },
   });

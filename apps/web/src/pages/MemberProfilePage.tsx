@@ -44,7 +44,7 @@ export function MemberProfilePage() {
   const { memberId = '' } = useParams();
   const client = useQueryClient();
   const member = useQuery({ queryKey: ['member', memberId], queryFn: () => getMember(memberId) });
- 
+
   const subscriptions = useQuery({
     queryKey: ['subscriptions', memberId],
     queryFn: () => getSubscriptions(memberId),

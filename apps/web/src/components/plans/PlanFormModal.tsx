@@ -54,9 +54,7 @@ export function PlanFormModal({
   const mutation = useMutation({
     mutationFn: (input: PlanInput) => (plan ? updatePlan(plan.id, input) : createPlan(input)),
     onSuccess: async () => {
-      await Promise.all([
-        client.invalidateQueries({ queryKey: ['plans'] }),
-      ]);
+      await Promise.all([client.invalidateQueries({ queryKey: ['plans'] })]);
       onClose();
     },
     onError: (value) =>

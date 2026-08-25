@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, SubmitEvent, useMemo, useState } from 'react';
 import { ApiError, createSubscription, getPlans, renewSubscription } from '../../api/client';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -56,15 +56,17 @@ export function SubscriptionFormModal({ memberId, renewal, isOpen, onClose }: Pr
     setPlanId(id);
     const plan = plans.data?.items.find((item) => item.id === id);
     setPrice(
-      plan?.prices.find((price) => price.durationMonths === durationMonths)?.priceMinor ?? 0,
+      (plan?.prices.find((price) => price.durationMonths === durationMonths)?.priceMinor ?? 0) 
     );
   };
   const chooseDuration = (value: number) => {
     const duration = value as (typeof durations)[number];
     setDuration(duration);
-    setPrice(selected?.prices.find((price) => price.durationMonths === duration)?.priceMinor ?? 0);
+    setPrice(
+      (selected?.prices.find((price) => price.durationMonths === duration)?.priceMinor ?? 0) ,
+    );
   };
-  const submit = (event: FormEvent) => {
+  const submit = (event: SubmitEvent) => {
     event.preventDefault();
     mutation.mutate();
   };
@@ -125,21 +127,21 @@ export function SubscriptionFormModal({ memberId, renewal, isOpen, onClose }: Pr
           </p>
         )}
         <label className="block text-sm font-semibold">
-          السعر المتفق عليه (قرش)
+          السعر المتفق عليه (جنيه)
           <Input
             className="mt-1"
             min="0"
             required
             type="number"
-            value={agreedPriceMinor}
-            onChange={(e) => setPrice(Number(e.target.value))}
+            value={agreedPriceMinor / 100}
+            onChange={(e) => setPrice(Number(e.target.value) * 100)}
           />
         </label>
         {selected && (
           <p className="text-sm text-[#68736b]">
             السعر المعلن:{' '}
             {(selected.prices.find((price) => price.durationMonths === durationMonths)
-              ?.priceMinor ?? 0) / 100}{' '}
+              ?.priceMinor ?? 0) / 100}
             ج.م
           </p>
         )}

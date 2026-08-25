@@ -9,157 +9,149 @@ export function PhotoCapture({
   value: Blob | null;
   onChange: (value: Blob | null) => void;
 }) {
-const video = useRef<HTMLVideoElement>(null);
-const stream = useRef<MediaStream | null>(null);
+  const video = useRef<HTMLVideoElement>(null);
+  const stream = useRef<MediaStream | null>(null);
 
-const [preview, setPreview] = useState<string | null>(null);
-const [cameraOpen, setCameraOpen] = useState(false);
-const [cameraError, setCameraError] = useState('');
+  const [preview, setPreview] = useState<string | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [cameraError, setCameraError] = useState('');
 
-useEffect(() => {
-  if (!value) {
-    setPreview(null);
-    return;
-  }
-
-  const url = URL.createObjectURL(value);
-  setPreview(url);
-
-  return () => URL.revokeObjectURL(url);
-}, [value]);
-
-useEffect(() => {
-  return () => {
-    stream.current?.getTracks().forEach((track) => track.stop());
-  };
-}, []);
-
-// This is the important fix.
-// Run AFTER cameraOpen causes <video> to actually render.
-useEffect(() => {
-  if (!cameraOpen) return;
-
-  const videoElement = video.current;
-  const mediaStream = stream.current;
-
-  if (!videoElement || !mediaStream) return;
-
-  videoElement.srcObject = mediaStream;
-
-  const playVideo = async () => {
-    try {
-      await videoElement.play();
-    } catch (error) {
-      console.error('Failed to play camera stream:', error);
+  useEffect(() => {
+    if (!value) {
+      setPreview(null);
+      return;
     }
-  };
 
-  void playVideo();
+    const url = URL.createObjectURL(value);
+    setPreview(url);
 
-  return () => {
-    videoElement.srcObject = null;
-  };
-}, [cameraOpen]);
+    return () => URL.revokeObjectURL(url);
+  }, [value]);
 
-const stopCamera = () => {
-  if (video.current) {
-    video.current.pause();
-    video.current.srcObject = null;
-  }
+  useEffect(() => {
+    return () => {
+      stream.current?.getTracks().forEach((track) => track.stop());
+    };
+  }, []);
 
-  stream.current?.getTracks().forEach((track) => track.stop());
-  stream.current = null;
+  // This is the important fix.
+  // Run AFTER cameraOpen causes <video> to actually render.
+  useEffect(() => {
+    if (!cameraOpen) return;
 
-  setCameraOpen(false);
-};
+    const videoElement = video.current;
+    const mediaStream = stream.current;
 
-const startCamera = async () => {
-  setCameraError('');
+    if (!videoElement || !mediaStream) return;
 
-  try {
-    // Kill any previous stream
-    stream.current?.getTracks().forEach((track) => track.stop());
+    videoElement.srcObject = mediaStream;
 
-    const media = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: 'user',
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-      },
-      audio: false,
-    });
+    const playVideo = async () => {
+      try {
+        await videoElement.play();
+      } catch (error) {
+        console.error('Failed to play camera stream:', error);
+      }
+    };
 
-    stream.current = media;
+    void playVideo();
 
-    // Render <video>.
-    // useEffect above will attach the stream.
-    setCameraOpen(true);
-  } catch (error) {
-    console.error('Camera error:', error);
+    return () => {
+      videoElement.srcObject = null;
+    };
+  }, [cameraOpen]);
 
-    setCameraError(
-      'تعذر تشغيل الكاميرا. يمكنك اختيار صورة من الجهاز بدلاً منها.',
-    );
+  const stopCamera = () => {
+    if (video.current) {
+      video.current.pause();
+      video.current.srcObject = null;
+    }
 
     stream.current?.getTracks().forEach((track) => track.stop());
     stream.current = null;
+
     setCameraOpen(false);
-  }
-};
+  };
 
-const capture = () => {
-  const source = video.current;
+  const startCamera = async () => {
+    setCameraError('');
 
-  if (!source || !source.videoWidth || !source.videoHeight) {
-    console.error('Camera video is not ready');
-    return;
-  }
+    try {
+      // Kill any previous stream
+      stream.current?.getTracks().forEach((track) => track.stop());
 
-  const canvas = document.createElement('canvas');
+      const media = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user',
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      });
 
-  canvas.width = source.videoWidth;
-  canvas.height = source.videoHeight;
+      stream.current = media;
 
-  const context = canvas.getContext('2d');
+      // Render <video>.
+      // useEffect above will attach the stream.
+      setCameraOpen(true);
+    } catch (error) {
+      console.error('Camera error:', error);
 
-  if (!context) return;
+      setCameraError('تعذر تشغيل الكاميرا. يمكنك اختيار صورة من الجهاز بدلاً منها.');
 
-  context.drawImage(
-    source,
-    0,
-    0,
-    source.videoWidth,
-    source.videoHeight,
-  );
+      stream.current?.getTracks().forEach((track) => track.stop());
+      stream.current = null;
+      setCameraOpen(false);
+    }
+  };
 
-  canvas.toBlob(
-    (blob) => {
-      if (!blob) {
-        console.error('Failed to create image blob');
-        return;
-      }
+  const capture = () => {
+    const source = video.current;
 
-      onChange(blob);
-      stopCamera();
-    },
-    'image/jpeg',
-    0.9,
-  );
-};
+    if (!source || !source.videoWidth || !source.videoHeight) {
+      console.error('Camera video is not ready');
+      return;
+    }
 
-const choose = (event: ChangeEvent<HTMLInputElement>) => {
-  const file = event.target.files?.[0];
+    const canvas = document.createElement('canvas');
 
-  if (!file) return;
+    canvas.width = source.videoWidth;
+    canvas.height = source.videoHeight;
 
-  if (file.size > 5 * 1024 * 1024) {
-    setCameraError('حجم الصورة يتجاوز 5 ميجابايت.');
-    return;
-  }
+    const context = canvas.getContext('2d');
 
-  setCameraError('');
-  onChange(file);
-};
+    if (!context) return;
+
+    context.drawImage(source, 0, 0, source.videoWidth, source.videoHeight);
+
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          console.error('Failed to create image blob');
+          return;
+        }
+
+        onChange(blob);
+        stopCamera();
+      },
+      'image/jpeg',
+      0.9,
+    );
+  };
+
+  const choose = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setCameraError('حجم الصورة يتجاوز 5 ميجابايت.');
+      return;
+    }
+
+    setCameraError('');
+    onChange(file);
+  };
 
   return (
     <fieldset className="sm:col-span-2">
