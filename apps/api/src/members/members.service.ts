@@ -71,10 +71,7 @@ export class MembersService {
             ? SubscriptionStateFilter.EXPIRED
             : SubscriptionStateFilter.NONE;
       const displayedSubscription = active ?? scheduled ?? latestExpired;
-      const charges = subscriptions.reduce(
-        (sum, item) => sum + Number(item.agreedPriceMinor),
-        0,
-      );
+      const charges = subscriptions.reduce((sum, item) => sum + Number(item.agreedPriceMinor), 0);
       const paid = payments.reduce((sum, item) => sum + Number(item.amountMinor), 0);
       return {
         id: member.id,

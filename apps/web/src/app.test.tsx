@@ -34,29 +34,23 @@ describe('authentication experience', () => {
     api.login.mockReset();
     api.getCurrentOwner.mockReset();
     api.getHealth.mockReset().mockResolvedValue({ status: 'ok', database: 'ok' });
-    api.getDashboardSummary
-      .mockReset()
-      .mockResolvedValue({
-        activeMembers: 12,
-        expiredMemberships: 2,
-        expiringWithin7Days: 1,
-        newMembersThisMonth: 3,
-        revenueTodayMinor: 10000,
-        revenueThisMonthMinor: 50000,
-        totalOutstandingDebtMinor: 20000,
-      });
-    api.getDashboardDebtors
-      .mockReset()
-      .mockResolvedValue({
-        items: [],
-        pagination: { page: 1, limit: 6, totalItems: 0, totalPages: 0 },
-      });
-    api.getDashboardExpiring
-      .mockReset()
-      .mockResolvedValue({
-        items: [],
-        pagination: { page: 1, limit: 6, totalItems: 0, totalPages: 0 },
-      });
+    api.getDashboardSummary.mockReset().mockResolvedValue({
+      activeMembers: 12,
+      expiredMemberships: 2,
+      expiringWithin7Days: 1,
+      newMembersThisMonth: 3,
+      revenueTodayMinor: 10000,
+      revenueThisMonthMinor: 50000,
+      totalOutstandingDebtMinor: 20000,
+    });
+    api.getDashboardDebtors.mockReset().mockResolvedValue({
+      items: [],
+      pagination: { page: 1, limit: 6, totalItems: 0, totalPages: 0 },
+    });
+    api.getDashboardExpiring.mockReset().mockResolvedValue({
+      items: [],
+      pagination: { page: 1, limit: 6, totalItems: 0, totalPages: 0 },
+    });
   });
 
   it('shows the Arabic login error for invalid credentials', async () => {

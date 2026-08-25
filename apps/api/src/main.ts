@@ -15,9 +15,9 @@ async function bootstrap() {
     origin: process.env.APP_ORIGIN ?? 'http://localhost:5173',
     credentials: true,
   });
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true,
-forbidNonWhitelisted: true,
-transform: true, }));
+  app.useGlobalPipes(
+    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+  );
   app.useGlobalFilters(new ApiErrorFilter());
   await app.listen(Number(process.env.API_PORT ?? 3000));
 }
