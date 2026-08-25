@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Filter, Plus, Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getMembers, MemberListItem } from '../api/client';

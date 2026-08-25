@@ -3,6 +3,8 @@
   "private": true,
   "packageManager": "pnpm@10.12.4",
   "scripts": {
+    "prepare": "node -e \"require('node:fs').chmodSync('.githooks/pre-commit', 0o755)\" && git config core.hooksPath .githooks",
+    "precommit": "corepack pnpm format:check && corepack pnpm lint && corepack pnpm typecheck",
     "dev": "corepack pnpm --parallel --filter @gym/api --filter @gym/web dev",
     "build": "corepack pnpm --recursive --if-present build",
     "lint": "corepack pnpm --recursive --if-present lint",
