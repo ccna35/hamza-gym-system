@@ -1,4 +1,4 @@
-import { BarChart3, ClipboardList, Dumbbell, ScrollText, Users } from 'lucide-react';
+import { BarChart3, ClipboardList, Dumbbell, Users } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 interface NavigationProps {

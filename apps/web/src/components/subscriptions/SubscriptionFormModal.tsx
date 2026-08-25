@@ -48,7 +48,6 @@ export function SubscriptionFormModal({ memberId, renewal, isOpen, onClose }: Pr
         client.invalidateQueries({ queryKey: ['subscriptions', memberId] }),
         client.invalidateQueries({ queryKey: ['payments', memberId] }),
         client.invalidateQueries({ queryKey: ['members'] }),
-        client.invalidateQueries({ queryKey: ['member-audit', memberId] }),
       ]);
       onClose();
     },

@@ -30,7 +30,6 @@ export function PhotoUploadModal({
       await Promise.all([
         client.invalidateQueries({ queryKey: ['member', memberId] }),
         client.invalidateQueries({ queryKey: ['members'] }),
-        client.invalidateQueries({ queryKey: ['member-audit', memberId] }),
       ]);
       onClose();
     },

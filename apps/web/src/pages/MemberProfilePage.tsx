@@ -15,7 +15,6 @@ import { useState } from 'react';
 import {
   archiveMember,
   getMember,
-  getMemberAuditLog,
   getPayments,
   getSubscriptions,
   Payment,
@@ -35,17 +34,6 @@ const money = (minor: number) =>
   new Intl.NumberFormat('ar-EG', { style: 'currency', currency: 'EGP' }).format(minor / 100);
 const date = (value: string) =>
   new Intl.DateTimeFormat('ar-EG', { dateStyle: 'long' }).format(new Date(`${value}T12:00:00Z`));
-const actionLabels: Record<string, string> = {
-  MEMBER_CREATED: 'إنشاء العضو',
-  MEMBER_UPDATED: 'تعديل البيانات',
-  MEMBER_ARCHIVED: 'أرشفة العضو',
-  MEMBER_RESTORED: 'استعادة العضو',
-  PAYMENT_CREATED: 'تسجيل دفعة',
-  PAYMENT_VOIDED: 'إلغاء دفعة',
-  SUBSCRIPTION_CREATED: 'إنشاء اشتراك',
-  SUBSCRIPTION_UPDATED: 'تعديل اشتراك',
-  SUBSCRIPTION_VOIDED: 'إلغاء اشتراك',
-};
 
 export function MemberProfilePage() {
   const [formOpen, setFormOpen] = useState(false);
@@ -56,11 +44,7 @@ export function MemberProfilePage() {
   const { memberId = '' } = useParams();
   const client = useQueryClient();
   const member = useQuery({ queryKey: ['member', memberId], queryFn: () => getMember(memberId) });
-  const audit = useQuery({
-    queryKey: ['member-audit', memberId],
-    queryFn: () => getMemberAuditLog(memberId),
-    enabled: member.isSuccess,
-  });
+ 
   const subscriptions = useQuery({
     queryKey: ['subscriptions', memberId],
     queryFn: () => getSubscriptions(memberId),
@@ -77,7 +61,6 @@ export function MemberProfilePage() {
       await Promise.all([
         client.invalidateQueries({ queryKey: ['member', memberId] }),
         client.invalidateQueries({ queryKey: ['members'] }),
-        client.invalidateQueries({ queryKey: ['member-audit', memberId] }),
       ]);
     },
   });

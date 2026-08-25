@@ -164,52 +164,6 @@ export async function uploadMemberPhoto(memberId: string, file: Blob) {
   return response.json() as Promise<{ photoUrl: string }>;
 }
 
-export type AuditEntityType = 'MEMBER' | 'PLAN' | 'SUBSCRIPTION' | 'PAYMENT';
-export type AuditAction =
-  | 'MEMBER_CREATED'
-  | 'MEMBER_UPDATED'
-  | 'MEMBER_ARCHIVED'
-  | 'MEMBER_RESTORED'
-  | 'PLAN_CREATED'
-  | 'PLAN_UPDATED'
-  | 'PLAN_ENABLED'
-  | 'PLAN_DISABLED'
-  | 'SUBSCRIPTION_CREATED'
-  | 'SUBSCRIPTION_UPDATED'
-  | 'SUBSCRIPTION_VOIDED'
-  | 'PAYMENT_CREATED'
-  | 'PAYMENT_VOIDED';
-export type AuditLogItem = {
-  id: string;
-  actorOwnerId: string;
-  entityType: AuditEntityType;
-  entityId: string;
-  action: AuditAction;
-  before: Record<string, unknown> | null;
-  after: Record<string, unknown> | null;
-  metadata: Record<string, unknown> | null;
-  createdAt: string;
-};
-export type AuditFilters = {
-  entityType?: AuditEntityType;
-  action?: AuditAction;
-  entityId?: string;
-  from?: string;
-  to?: string;
-  page?: number;
-  limit?: number;
-};
-export function getAuditLogs(filters: AuditFilters) {
-  return request<{ items: AuditLogItem[]; pagination: Pagination }>(
-    `/audit-logs${queryString(filters)}`,
-  );
-}
-export function getMemberAuditLog(memberId: string, page = 1) {
-  return request<{ items: AuditLogItem[]; pagination: Pagination }>(
-    `/members/${memberId}/audit-log${queryString({ page, limit: 20 })}`,
-  );
-}
-
 export type PlanPrice = { durationMonths: 1 | 3 | 6 | 12; priceMinor: number };
 export type Plan = {
   id: string;

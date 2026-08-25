@@ -54,7 +54,6 @@ export function MemberFormModal({
       await Promise.all([
         client.invalidateQueries({ queryKey: ['members'] }),
         client.invalidateQueries({ queryKey: ['member', saved.id] }),
-        client.invalidateQueries({ queryKey: ['member-audit', saved.id] }),
       ]);
       onClose();
     },

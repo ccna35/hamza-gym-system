@@ -56,7 +56,6 @@ export function PlanFormModal({
     onSuccess: async () => {
       await Promise.all([
         client.invalidateQueries({ queryKey: ['plans'] }),
-        client.invalidateQueries({ queryKey: ['audit-logs'] }),
       ]);
       onClose();
     },

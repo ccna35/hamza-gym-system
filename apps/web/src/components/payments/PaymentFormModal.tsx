@@ -27,7 +27,6 @@ export function PaymentFormModal({
         client.invalidateQueries({ queryKey: ['member', memberId] }),
         client.invalidateQueries({ queryKey: ['payments', memberId] }),
         client.invalidateQueries({ queryKey: ['members'] }),
-        client.invalidateQueries({ queryKey: ['member-audit', memberId] }),
       ]);
       setAmountEgp('');
       onClose();

@@ -3,3 +3,4 @@ dist
 coverage
 .git
 *.lock
+pnpm-lock.yaml
